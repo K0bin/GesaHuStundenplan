@@ -33,5 +33,10 @@ namespace StundenplanImport.Model.GesaHu
             Tag = tag;
             SchoolClass = schoolClass;
         }
+
+        public override string ToString()
+        {
+            return string.Format("Class: Name={0}, Teacher={1}, Room={2}, SchoolClass={3}, Tag={4}", Name, Teacher, Room, SchoolClass, Tag);
+        }
     }
 }

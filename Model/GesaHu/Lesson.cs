@@ -67,6 +67,11 @@ namespace StundenplanImport.Model.GesaHu
             return builder.ToString();
         }
 
+        public override string ToString()
+        {
+            return string.Format("Lesson: Day={2}, Number={3}, Name={0}, Teacher={1}, Tag={4}", Name, Teacher, DayOfWeek, Number, Tag);
+        }
+
         public static Lesson FromGetString(string get)
         {
             var values = get.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
