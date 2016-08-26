@@ -18,7 +18,7 @@
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
             @foreach (var entry in (string[])ViewData["Classes"])
             {
-                <li>@Html.ActionLink(entry, "publish", new { Class = entry })</li>
+                <li>@Html.ActionLink(entry, "edit", new { Class = entry })</li>
             }
         </ul>
     </div>
@@ -40,7 +40,7 @@
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
             @foreach (var entry in (string[])ViewData["Students"])
             {
-                <li>@Html.ActionLink(entry, "publish", new { Student = entry })</li>
+                <li>@Html.ActionLink(entry, "edit", new { Student = entry })</li>
             }
         </ul>
     </div>
@@ -62,7 +62,7 @@
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
             @foreach (var entry in (string[])ViewData["Teachers"])
             {
-                <li>@Html.ActionLink(entry, "publish", new { Teacher = entry })</li>
+                <li>@Html.ActionLink(entry, "edit", new { Teacher = entry })</li>
             }
         </ul>
     </div>

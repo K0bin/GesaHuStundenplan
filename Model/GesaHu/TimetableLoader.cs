@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StundenplanImport.Model
+namespace StundenplanImport.Model.GesaHu
 {
     public class TimetableLoader
     {
@@ -65,7 +65,7 @@ namespace StundenplanImport.Model
             uri = new Uri(url);
         }
 
-        public async Task<List<Lesson>> LoadAsync()
+        public async Task<Tuple<List<Lesson>, List<Class>>> LoadAsync()
         {
             var client = new HttpClient();
             var bytes = await client.GetByteArrayAsync(uri);
@@ -74,14 +74,15 @@ namespace StundenplanImport.Model
             return Parse(html);
         }
 
-        private List<Lesson> Parse(string html)
+        private Tuple<List<Lesson>, List<Class>> Parse(string html)
         {
             var lessons = new List<Lesson>();
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
             var body = doc.DocumentNode.Element("html").Element("body");
-            var table = body.Element("center").Element("table");
+            var tables = body.Element("center").Elements("table");
+            var table = tables.ElementAt(0);
 
             var rows = table.Elements("tr");
 
@@ -126,7 +127,17 @@ namespace StundenplanImport.Model
                 rowIndex++;
             }
 
-            return lessons;
+            List<Class> classes = null;
+            if (tables.Count() > 1)
+            {
+                var classesTable = tables.ElementAt(1);
+
+                if(!isOberstufe)
+                    classes = ParseClassesTable(classesTable);
+
+            }
+
+            return Tuple.Create(lessons, classes);
         }
 
         private Lesson ParseLesson(HtmlNode td, DayOfWeek dayOfWeek, int number, Lesson previousLesson = null)
@@ -137,10 +148,13 @@ namespace StundenplanImport.Model
             var innerTable = td.Element("table");
             var rows = innerTable.Elements("tr");
 
-            if (rows.Any())
+            if (!rows.Any())
                 return null;
             
             var rowColumns = rows.First().Elements("td");
+            if (!rowColumns.Any())
+                return null;
+
             var name = rowColumns.First().InnerText.Trim().Replace("*", "").Replace(".", "");
             var teacher = string.Empty;
             if(rowColumns.Count() > 1)
@@ -153,17 +167,83 @@ namespace StundenplanImport.Model
             }
 
             Lesson lesson = new Lesson(dayOfWeek, number, name, duration);
+            lesson.Name = name;
+            lesson.Teacher = teacher;
             
-            if (isOberstufe)
-                lesson.Course = new Course(teacher, string.Empty);
-            else
+            if (!isOberstufe)
             {
                 if(rows.Count() > 1)
                     lesson.Tag = rows.ElementAt(1).InnerText.Trim();
-            }
-                       
-
+            }                       
+            
             return lesson;
+        }
+
+        private List<Class> ParseClassesTable(HtmlNode table)
+        {
+            if (table == null)
+                return null;
+
+            var classes = new List<Class>();
+
+            var rows = table.Elements("tr");
+            var rowIndex = 0;
+
+            var tag = string.Empty;
+            foreach(var row in rows)
+            {
+                // Skip first (header) row
+                if (rowIndex == 0)
+                    continue;
+
+                var cells = row.Elements("td");
+                var cellIndex = 0;
+
+                var teacher = string.Empty;
+                var schoolClass = string.Empty;
+                var name = string.Empty;
+                var room = string.Empty;
+
+                foreach(var cell in cells)
+                {
+                    if (string.IsNullOrWhiteSpace(cell.InnerText))
+                        continue;
+
+                    var text = cell.InnerText.Trim();
+
+                    switch (cellIndex % 6)
+                    {
+                        case 0:
+                            if(name != string.Empty)                            
+                                classes.Add(new Class(name, teacher, tag, room));
+
+                            //Tag
+                            tag = text;
+                            break;
+
+                        case 1:
+                            text = text.Replace(" ", "");
+                            var parts = text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            if(parts.Length >= 1)                            
+                                teacher = parts[0].Trim();
+                            if (parts.Length >= 2)
+                                name = parts[1].Trim();
+                            if (parts.Length >= 3)
+                                room = parts[2].Trim();
+                            break;
+
+                        case 2:
+                            schoolClass = text;
+                            break;
+                    }
+
+                    cellIndex++;
+                }
+
+                rowIndex++;
+            }
+
+            return classes;
         }
     }
 }

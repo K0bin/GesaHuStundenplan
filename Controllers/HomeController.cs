@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using StundenplanImport.Model;
+using StundenplanImport.Model.GesaHu;
 
 namespace StundenplanImport.Controllers
 {
@@ -18,7 +18,7 @@ namespace StundenplanImport.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Publish(string @class, string student, string teacher)
+        public async Task<IActionResult> Edit(string @class, string student, string teacher)
         {
             TimetableLoader.Kind kind = TimetableLoader.Kind.Class;
             string element = "";
@@ -40,9 +40,12 @@ namespace StundenplanImport.Controllers
             }
 
             TimetableLoader timetable = new TimetableLoader(kind, element);
-            var lessons = await timetable.LoadAsync();
+            var data = await timetable.LoadAsync();
+            var lessons = data.Item1;
+            var classes = data.Item2;
 
             ViewData["Lessons"] = lessons;
+            ViewData["Classes"] = classes;
 
             return View();
         }
