@@ -36,20 +36,35 @@
                                     <td rowspan="@lesson.Duration.ToString()">
                                         <a href="javascript:void(0)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                                         <span class="subject">@lesson.Name<br />@lesson.Teacher</span>
-                                        @if (!string.IsNullOrWhiteSpace(lesson.Tag) && classes != null)
+                                        @if (lesson.Tags.Count > 0 && classes != null)
                                         {
+                                            var relevantClasses = new List<Class>();
                                             foreach (var _class in classes)
                                             {
-                                                if (_class.Tag == lesson.Tag)
+                                                bool isForClass = true;
+                                                if (ViewData.ContainsKey("SchoolClass") && ViewData.ContainsKey("SchoolYear") && !string.IsNullOrWhiteSpace(_class.SchoolClass))
                                                 {
-                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                        Auswählen
-                                                        <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                                        <li>@_class.ToString()</li>     
-                                                    </ul>
+                                                    isForClass = _class.SchoolClass.Contains((char)ViewData["SchoolClass"]) && _class.SchoolClass.Contains((string)ViewData["SchoolYear"]);
                                                 }
+
+                                                if (lesson.Tags.Contains(_class.Tag) && isForClass)
+                                                {
+                                                    relevantClasses.Add(_class);
+                                                }
+                                            }
+
+                                            if (relevantClasses.Count > 0)
+                                            {
+                                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu@(lessonRow * 10 + dayColumn)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                    Kurs
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu@(lessonRow * 10 + dayColumn)">
+                                                    @foreach(var _class in relevantClasses)
+                                                    { 
+                                                        <li>@_class.Teacher</li>
+                                                    }
+                                                </ul>
                                             }
                                         }
                                     </td>

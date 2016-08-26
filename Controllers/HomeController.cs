@@ -46,6 +46,17 @@ namespace StundenplanImport.Controllers
 
             ViewData["Lessons"] = lessons;
             ViewData["Classes"] = classes;
+            if (kind == TimetableLoader.Kind.Class)
+            {
+                var elementParts = element.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (elementParts.Length >= 1)
+                {
+                    var schoolClass = elementParts[0][elementParts[0].Length - 1];
+                    var schoolYear = elementParts[0].Substring(0, elementParts[0].Length);
+                    ViewData["SchoolClass"] = schoolClass;
+                    ViewData["SchoolYear"] = schoolYear;
+                }
+            }
 
             return View();
         }

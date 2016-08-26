@@ -33,13 +33,19 @@ namespace StundenplanImport.Model.GesaHu
 
         public int Duration
         { get; set; }
-        
+
+        /// <summary>
+        /// The class (for teacher timetables)
+        /// </summary>
+        public string SchoolClass
+        { get; set; }
+
         /// <summary>
         /// The tag found on the web timetable
         /// Used to assign a course from the second table
         /// </summary>
-        public string Tag
-        { get; set; }
+        public List<string> Tags
+        { get; set; } = new List<string>();
         
         public Lesson(DayOfWeek dayOfWeek, int number, string name, int duration = 1)
         {
@@ -62,14 +68,29 @@ namespace StundenplanImport.Model.GesaHu
             builder.Append(',');
             builder.Append(Duration);
             builder.Append(',');
-            builder.Append(Tag);
+
+            bool isFirstTag = true;
+            foreach (var tag in Tags)
+            {
+                if (!isFirstTag)
+                    builder.Append("-");
+
+                builder.Append(tag);
+                isFirstTag = false;
+            }
 
             return builder.ToString();
         }
 
         public override string ToString()
         {
-            return string.Format("Lesson: Day={2}, Number={3}, Name={0}, Teacher={1}, Tag={4}", Name, Teacher, DayOfWeek, Number, Tag);
+            string tags = "";
+            foreach(var tag in Tags)
+            {
+                tags += tag;
+            }
+
+            return string.Format("Lesson: Day={2}, Number={3}, Name={0}, Teacher={1}, Tag={4}", Name, Teacher, DayOfWeek, Number, tags);
         }
 
         public static Lesson FromGetString(string get)

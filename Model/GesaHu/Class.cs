@@ -38,5 +38,21 @@ namespace StundenplanImport.Model.GesaHu
         {
             return string.Format("Class: Name={0}, Teacher={1}, Room={2}, SchoolClass={3}, Tag={4}", Name, Teacher, Room, SchoolClass, Tag);
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Class)
+                return Equals((Class)obj);
+
+            return base.Equals(obj);
+        }
+
+        private bool Equals(Class other)
+        {
+            if (other == null)
+                return false;
+
+            return Name == other.Name && Room == other.Room && Teacher == other.Teacher && SchoolClass == other.SchoolClass && Tag == other.Tag;
+        }
     }
 }

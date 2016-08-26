@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -162,21 +163,29 @@ namespace StundenplanImport.Model.GesaHu
             if(rowColumns.Count() > 1)
                 teacher = rowColumns.ElementAt(1).InnerText.Trim();
             int duration = int.Parse(td.Attributes["rowspan"].Value) / 2;
-            if (previousLesson != null && name == previousLesson.Name)
+
+            string tag = string.Empty;
+            if (!isOberstufe)
+            {
+                if (rows.Count() > 1)
+                    tag = rows.ElementAt(1).InnerText.Trim();
+            }
+
+            if (previousLesson != null && name.ToLower() == previousLesson.Name.ToLower())
             {
                 previousLesson.Duration += duration;
+                if (!string.IsNullOrWhiteSpace(tag))
+                    previousLesson.Tags.Add(tag);
+
                 return null;
             }
 
             Lesson lesson = new Lesson(dayOfWeek, number, name, duration);
             lesson.Name = name;
             lesson.Teacher = teacher;
-            
-            if (!isOberstufe)
-            {
-                if(rows.Count() > 1)
-                    lesson.Tag = rows.ElementAt(1).InnerText.Trim();
-            }                       
+
+            if (!string.IsNullOrWhiteSpace(tag))
+                lesson.Tags.Add(tag);
             
             return lesson;
         }
@@ -191,8 +200,14 @@ namespace StundenplanImport.Model.GesaHu
             var rows = table.Elements("tr");
             var rowIndex = 0;
 
-            var tag = string.Empty;
-            foreach(var row in rows)
+            var leftTag = string.Empty;
+            var rightTag = string.Empty;
+            var teacher = string.Empty;
+            var schoolClass = string.Empty;
+            var name = string.Empty;
+            var room = string.Empty;
+
+            foreach (var row in rows)
             {
                 // Skip first (header) row
                 if (rowIndex == 0)
@@ -204,43 +219,52 @@ namespace StundenplanImport.Model.GesaHu
                 var cells = row.Elements("td");
                 var cellIndex = 0;
 
-                var teacher = string.Empty;
-                var schoolClass = string.Empty;
-                var name = string.Empty;
-                var room = string.Empty;
-
                 foreach(var cell in cells)
                 {
-                    if (!string.IsNullOrWhiteSpace(cell.InnerText))
+                    var text = WebUtility.HtmlDecode(cell.InnerText).Trim();
+                    if (!string.IsNullOrWhiteSpace(text))
                     {
-                        var text = cell.InnerText.Trim();
-
                         switch (cellIndex % 6)
                         {
                             case 0:
                                 if (name != string.Empty)
                                 {
-                                    var _class = new Class(name, teacher, tag, schoolClass);
+                                    var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
 
                                     if (!string.IsNullOrWhiteSpace(room))
                                         _class.Room = room;
 
-                                    classes.Add(_class);
+                                    if(!classes.Contains(_class))
+                                        classes.Add(_class);
+
+                                    teacher = string.Empty;
+                                    schoolClass = string.Empty;
+                                    name = string.Empty;
+                                    room = string.Empty;
                                 }
 
                                 //Tag
-                                tag = text;
+                                if (cellIndex > 5)
+                                    rightTag = text;
+                                else
+                                    leftTag = text;
                                 break;
 
                             case 1:
                                 if (name != string.Empty)
                                 {
-                                    var _class = new Class(name, teacher, tag, schoolClass);
+                                    var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
 
                                     if (!string.IsNullOrWhiteSpace(room))
                                         _class.Room = room;
 
-                                    classes.Add(_class);
+                                    if (!classes.Contains(_class))
+                                        classes.Add(_class);
+
+                                    teacher = string.Empty;
+                                    schoolClass = string.Empty;
+                                    name = string.Empty;
+                                    room = string.Empty;
                                 }
 
                                 text = text.Replace(" ", "");
