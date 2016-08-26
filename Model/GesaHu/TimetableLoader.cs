@@ -95,32 +95,34 @@ namespace StundenplanImport.Model.GesaHu
                     var columns = row.Elements("td");
                     foreach (var column in columns)
                     {
-                        if (columnIndex == 0 || !column.HasAttributes || column.Attributes["colspan"]?.Value?.Trim() != "12" || string.IsNullOrWhiteSpace(column.InnerText))
+                        if (columnIndex != 0 && column.HasAttributes && column.Attributes["colspan"]?.Value?.Trim() == "12" && !string.IsNullOrWhiteSpace(column.InnerText))
                         {
-                            columnIndex++;
-                        }
-                        else
-                        {
-                            var dayIndex = (columnIndex - 1);
-                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
                             var number = rowIndex / 2;
                             Lesson previousLesson = null;
+                            var dayIndex = (columnIndex - 1);
+                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
                             foreach (var lesson in lessons)
                             {
                                 if (lesson.DayOfWeek == dayOfWeek && lesson.Number == number - 1 && lesson.Duration > 1)
-                                    dayIndex++;
+                                {
+                                    columnIndex++;
+                                    dayIndex = (columnIndex - 1);
+                                    dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
+                                }
+                            }
 
-                                if(lesson.DayOfWeek == (DayOfWeek)((int)DayOfWeek.Monday + dayIndex) && (lesson.Number == number - 1 || (lesson.Number == number - 2 && lesson.Duration > 2)))
+                            // Find previous lesson to fix two lessons instead of a double
+                            foreach (var lesson in lessons)
+                            {
+                                if (lesson.DayOfWeek == dayOfWeek && (lesson.Number == number - 1 || (lesson.Number == number - 2 && lesson.Duration > 2)))
                                     previousLesson = lesson;
                             }
-                            dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
 
                             var parsedLesson = ParseLesson(column, (DayOfWeek)((int)DayOfWeek.Monday + dayIndex), number, previousLesson);
                             if(parsedLesson != null)
                                 lessons.Add(parsedLesson);
-
-                            columnIndex++;
                         }
+                        columnIndex++;
                     }
                 }
 
