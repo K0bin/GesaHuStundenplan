@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
+using StundenplanImport.Model;
 
 namespace StundenplanImport
 {
@@ -47,8 +51,6 @@ namespace StundenplanImport
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
-            //app.UseStaticFiles();
 
             app.UseMvc(routes =>
             {

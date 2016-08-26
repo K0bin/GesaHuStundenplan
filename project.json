@@ -20,9 +20,12 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
-    "Google.Apis.Calendar.v3": "1.15.0.577",
+    "Google.Apis.Calendar.v3": "1.16.0.593",
     "HtmlAgilityPack": "1.4.9.5",
-    "BundlerMinifier.Core": "2.1.258"
+    "BundlerMinifier.Core": "2.2.281",
+    "Microsoft.AspNetCore.Authentication.Google": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.MicrosoftAccount": "1.0.0",
+    "Microsoft.AspNetCore.Identity": "1.0.0"
   },
 
   "tools": {

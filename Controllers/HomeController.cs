@@ -57,7 +57,6 @@ namespace StundenplanImport.Controllers
 
             var viewModel = new EditViewModel(kind, lessonVMs);
 
-
             return View(viewModel);
         }
 

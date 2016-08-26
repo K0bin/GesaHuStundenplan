@@ -24,5 +24,10 @@ namespace StundenplanImport.Model
 
         public string Room
         { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("Lesson: Day={2}, Number={3}, Duration={4}, Name={0}, Teacher={1}, Room={5}", Name, TeacherOrSchoolClass, Day, Number, Duration, Room);
+        }
     }
 }
