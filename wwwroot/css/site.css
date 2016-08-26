@@ -13,3 +13,14 @@
 .timetable {
     width: 100%;
 }
+
+.timetable a {
+    vertical-align:middle;
+    margin-right:16px;
+}
+
+.timetable .subject {
+    display:inline-block;
+    vertical-align:middle;
+    margin-right:16px;
+}

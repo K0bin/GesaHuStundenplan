@@ -24,15 +24,35 @@
                 <tr>
                     <td>@(lessonRow + 1)</td>
                     @for(int dayColumn = 0; dayColumn < 5; dayColumn++)
-                    {
-                        bool hasLesson = false;
-                        var lessons = (List<Lesson>)ViewData["Lessons"];
-                        foreach (var lesson in lessons)
                         {
-                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
-                            if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow)
+                            bool hasLesson = false;
+                            var lessons = (List<Lesson>)ViewData["Lessons"];
+                            var classes = (List<Class>)ViewData["Classes"];
+                            foreach (var lesson in lessons)
                             {
-                                <td rowspan="@lesson.Duration.ToString()">@lesson.Name<br />@lesson.Teacher</td>
+                                var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
+                                if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow)
+                                {
+                                    <td rowspan="@lesson.Duration.ToString()">
+                                        <a href="javascript:void(0)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                                        <span class="subject">@lesson.Name<br />@lesson.Teacher</span>
+                                        @if (!string.IsNullOrWhiteSpace(lesson.Tag) && classes != null)
+                                        {
+                                            foreach (var _class in classes)
+                                            {
+                                                if (_class.Tag == lesson.Tag)
+                                                {
+                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                        Auswählen
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                        <li>@_class.ToString()</li>     
+                                                    </ul>
+                                                }
+                                            }
+                                        }
+                                    </td>
                                 hasLesson = true;
                             }
                             else if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1)

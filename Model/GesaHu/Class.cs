@@ -14,7 +14,7 @@ namespace StundenplanImport.Model.GesaHu
         { get; set; }
 
         public string Room
-        { get; set; }
+        { get; set; } = string.Empty;
 
         public string SchoolClass
         { get; set; }

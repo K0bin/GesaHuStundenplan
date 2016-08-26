@@ -196,7 +196,10 @@ namespace StundenplanImport.Model.GesaHu
             {
                 // Skip first (header) row
                 if (rowIndex == 0)
+                {
+                    rowIndex++;
                     continue;
+                }
 
                 var cells = row.Elements("td");
                 var cellIndex = 0;
@@ -208,35 +211,52 @@ namespace StundenplanImport.Model.GesaHu
 
                 foreach(var cell in cells)
                 {
-                    if (string.IsNullOrWhiteSpace(cell.InnerText))
-                        continue;
-
-                    var text = cell.InnerText.Trim();
-
-                    switch (cellIndex % 6)
+                    if (!string.IsNullOrWhiteSpace(cell.InnerText))
                     {
-                        case 0:
-                            if(name != string.Empty)                            
-                                classes.Add(new Class(name, teacher, tag, room));
+                        var text = cell.InnerText.Trim();
 
-                            //Tag
-                            tag = text;
-                            break;
+                        switch (cellIndex % 6)
+                        {
+                            case 0:
+                                if (name != string.Empty)
+                                {
+                                    var _class = new Class(name, teacher, tag, schoolClass);
 
-                        case 1:
-                            text = text.Replace(" ", "");
-                            var parts = text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                            if(parts.Length >= 1)                            
-                                teacher = parts[0].Trim();
-                            if (parts.Length >= 2)
-                                name = parts[1].Trim();
-                            if (parts.Length >= 3)
-                                room = parts[2].Trim();
-                            break;
+                                    if (!string.IsNullOrWhiteSpace(room))
+                                        _class.Room = room;
 
-                        case 2:
-                            schoolClass = text;
-                            break;
+                                    classes.Add(_class);
+                                }
+
+                                //Tag
+                                tag = text;
+                                break;
+
+                            case 1:
+                                if (name != string.Empty)
+                                {
+                                    var _class = new Class(name, teacher, tag, schoolClass);
+
+                                    if (!string.IsNullOrWhiteSpace(room))
+                                        _class.Room = room;
+
+                                    classes.Add(_class);
+                                }
+
+                                text = text.Replace(" ", "");
+                                var parts = text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (parts.Length >= 1)
+                                    teacher = parts[0].Trim();
+                                if (parts.Length >= 2)
+                                    name = parts[1].Trim();
+                                if (parts.Length >= 3)
+                                    room = parts[2].Trim();
+                                break;
+
+                            case 2:
+                                schoolClass = text;
+                                break;
+                        }
                     }
 
                     cellIndex++;
