@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="row">
+    <div class="col-md-12">
+        <h3>Wähle deinen Stundenplan aus:</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3 col-xs-6">
+        <h5>Klasse</h5>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Auswählen
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            @foreach (var entry in (string[])ViewData["Classes"])
+            {
+                <li>@Html.ActionLink(entry, "publish", new { Class = entry })</li>
+            }
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h8>oder</h8>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3 col-xs-6">
+        <h5>Schüler</h5>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Auswählen
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            @foreach (var entry in (string[])ViewData["Students"])
+            {
+                <li>@Html.ActionLink(entry, "publish", new { Student = entry })</li>
+            }
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h8>oder</h8>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3 col-xs-6">
+        <h5>Lehrer</h5>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Auswählen
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            @foreach (var entry in (string[])ViewData["Teachers"])
+            {
+                <li>@Html.ActionLink(entry, "publish", new { Teacher = entry })</li>
+            }
+        </ul>
+    </div>
+</div>

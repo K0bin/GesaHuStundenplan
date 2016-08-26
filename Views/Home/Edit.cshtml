@@ -1,0 +1,53 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@using StundenplanImport.Model.GesaHu;
+
+<table class="table-bordered timetable">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Montag</th>
+            <th>Dienstag</th>
+            <th>Mittwoch</th>
+            <th>Donnerstag</th>
+            <th>Freitag</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            for (int lessonRow = 0; lessonRow < 10; lessonRow++)
+            {
+                <tr>
+                    <td>@(lessonRow + 1)</td>
+                    @for(int dayColumn = 0; dayColumn < 5; dayColumn++)
+                    {
+                        bool hasLesson = false;
+                        var lessons = (List<Lesson>)ViewData["Lessons"];
+                        foreach (var lesson in lessons)
+                        {
+                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
+                            if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow)
+                            {
+                                <td rowspan="@lesson.Duration.ToString()">@lesson.Name<br />@lesson.Teacher</td>
+                                hasLesson = true;
+                            }
+                            else if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1)
+                            {
+                                hasLesson = true;
+                            }
+                        }
+
+                        if (!hasLesson)
+                        {
+                            <td></td>
+                        }
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>

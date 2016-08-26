@@ -1,0 +1,47 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@using StundenplanImport.Model;
+
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>Montag</th>
+            <th>Dienstag</th>
+            <th>Mittwoch</th>
+            <th>Donnerstag</th>
+            <th>Freitag</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            for (int lessonRow = 0; lessonRow < 10; lessonRow++)
+            {
+                <tr>
+                    <td>@(lessonRow + 1)</td>
+                    @for(int dayColumn = 0; dayColumn < 5; dayColumn++)
+                    {
+                        bool hasLesson = false;
+                        foreach (var lesson in (List<Lesson>)ViewData["Lessons"])
+                        {
+                            if (lesson.DayOfWeek == (DayOfWeek)((int)DayOfWeek.Monday + dayColumn) && lesson.Number == lessonRow)
+                            {
+                                <td rowspan="@lesson.Duration.ToString()">@lesson.Name<br />@lesson.Course?.Teacher</td>
+                                hasLesson = true;
+                            }
+                        }
+
+                        if (!hasLesson)
+                        {
+                            <td></td>
+                        }
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>

@@ -1,0 +1,11 @@
+﻿/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.dropdown-menu {
+    height: 256px;
+    overflow-y:scroll;
+}
