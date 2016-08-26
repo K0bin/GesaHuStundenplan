@@ -24,3 +24,16 @@
     vertical-align:middle;
     margin-right:16px;
 }
+
+.timetable .dropdown {
+    display:inline-block;
+}
+
+.timetable .bootstrap-select {
+    width: auto !important;
+}
+
+.timetable td:not(:first-child) {
+    vertical-align: middle;
+    width:256px;
+}

@@ -15,6 +15,10 @@ namespace StundenplanImport.Model.GesaHu
 
         private Uri uri;
 
+        private bool hasSchoolClass = false;
+        private string schoolYear;
+        private char schoolClass;
+
         public TimetableLoader(TimetableKind kind, string element, Week week = Week.Even, Semester semester = Semester.First)
         {
             int table = 4 + (int)week + (int)semester * 2;
@@ -27,6 +31,14 @@ namespace StundenplanImport.Model.GesaHu
                 case TimetableKind.Class:
                     index = Array.IndexOf(Names.Classes, element);
                     kindChar = 'c';
+
+                    var elementParts = element.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (elementParts.Length >= 1)
+                    {
+                        hasSchoolClass = true;
+                        schoolClass = elementParts[0][elementParts[0].Length - 1];
+                        schoolYear = elementParts[0].Substring(0, elementParts[0].Length);
+                    }
                     break;
 
                 case TimetableKind.Student:
@@ -47,7 +59,7 @@ namespace StundenplanImport.Model.GesaHu
             uri = new Uri(url);
         }
 
-        public async Task<Tuple<List<Lesson>, List<Class>>> LoadAsync()
+        public async Task<List<Lesson>> LoadAsync()
         {
             var client = new HttpClient();
             var bytes = await client.GetByteArrayAsync(uri);
@@ -56,7 +68,7 @@ namespace StundenplanImport.Model.GesaHu
             return Parse(html);
         }
 
-        private Tuple<List<Lesson>, List<Class>> Parse(string html)
+        private List<Lesson> Parse(string html)
         {
             var lessons = new List<Lesson>();
             var doc = new HtmlDocument();
@@ -116,12 +128,38 @@ namespace StundenplanImport.Model.GesaHu
             {
                 var classesTable = tables.ElementAt(1);
 
-                if(kind == TimetableKind.Class)
+                if (kind == TimetableKind.Class)
+                {
                     classes = ParseClassesTable(classesTable);
 
+                    foreach (var lesson in lessons)
+                    {
+                        List<Class> relevantClasses = new List<Class>();
+                        if (lesson.Tags.Count > 0 && classes != null)
+                        {
+                            foreach (var _class in classes)
+                            {
+                                bool isForClass = true;
+                                if (kind == TimetableKind.Class && hasSchoolClass && !string.IsNullOrWhiteSpace(_class.SchoolClass))
+                                    isForClass = _class.SchoolClass.Contains(schoolClass) && _class.SchoolClass.Contains(schoolYear);
+
+                                if (lesson.Tags.Contains(_class.Tag) && isForClass && !relevantClasses.Contains(_class))
+                                    relevantClasses.Add(_class);
+                            }
+                        }
+
+                        if(relevantClasses.Count == 1)
+                        {
+                            lesson.Name = relevantClasses[0].Name;
+                            lesson.Teacher = relevantClasses[0].Teacher;
+                        }
+                        else
+                            lesson.Classes = relevantClasses;
+                    }
+                }
             }
 
-            return Tuple.Create(lessons, classes);
+            return lessons;
         }
 
         private Lesson ParseLesson(HtmlNode td, DayOfWeek dayOfWeek, int number, Lesson previousLesson = null)

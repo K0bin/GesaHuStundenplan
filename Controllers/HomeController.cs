@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using StundenplanImport.Model.GesaHu;
 using StundenplanImport.Model;
+using StundenplanImport.Model.ViewModel;
 
 namespace StundenplanImport.Controllers
 {
@@ -41,25 +42,27 @@ namespace StundenplanImport.Controllers
             }
 
             TimetableLoader timetable = new TimetableLoader(kind, element);
-            var data = await timetable.LoadAsync();
-            var lessons = data.Item1;
-            var classes = data.Item2;
+            var lessons = await timetable.LoadAsync();
 
-            ViewData["Lessons"] = lessons;
-            ViewData["Classes"] = classes;
-            ViewData["Kind"] = kind;
-            if (kind == TimetableKind.Class)
+            var lessonVMs = new List<LessonViewModel>();
+            foreach(var lesson in lessons)
             {
-                var elementParts = element.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (elementParts.Length >= 1)
+                var classVMs = new List<ClassViewModel>();
+                foreach(var _class in lesson.Classes)
                 {
-                    var schoolClass = elementParts[0][elementParts[0].Length - 1];
-                    var schoolYear = elementParts[0].Substring(0, elementParts[0].Length);
-                    ViewData["SchoolClass"] = schoolClass;
-                    ViewData["SchoolYear"] = schoolYear;
+                    classVMs.Add(new ClassViewModel(_class.Name, _class.Teacher, _class.Room));
                 }
+                lessonVMs.Add(new LessonViewModel(lesson.DayOfWeek, lesson.Number, lesson.Duration, lesson.Name, kind == TimetableKind.Teacher ? lesson.SchoolClass : lesson.Teacher, classVMs));
             }
 
+            var viewModel = new EditViewModel(kind, lessonVMs);
+
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> Publish(ICollection<Model.Lesson> lessons)
+        {
             return View();
         }
 

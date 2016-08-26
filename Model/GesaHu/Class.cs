@@ -5,26 +5,79 @@ using System.Threading.Tasks;
 
 namespace StundenplanImport.Model.GesaHu
 {
-    public class Class
+    public class Class : IEquatable<Class>
     {
+        private string name;
         public string Name
-        { get; set; }
+        {
+            get { return name; }
+            set
+            {
+                if (value != null)
+                    name = value.Trim().ToLower();
+                else
+                    name = string.Empty;
+            }
+        }
 
+        private string teacher;
         public string Teacher
-        { get; set; }
+        {
+            get { return teacher; }
+            set
+            {
+                if (value != null)
+                    teacher = value.Trim().ToLower();
+                else
+                    teacher = string.Empty;
+            }
+        }
 
+        private string room = string.Empty;
         public string Room
-        { get; set; } = string.Empty;
+        {
+            get { return room; }
+            set
+            {
+                if (value != null)
+                    room = value.Trim();
+                else
+                    room = string.Empty;
+            }
+        }
 
+        private string schoolClass;
         public string SchoolClass
-        { get; set; }
+        {
+            get
+            {
+                return schoolClass;
+            }
+            set
+            {
+                if (value != null)
+                    schoolClass = value.Trim().ToLower();
+                else
+                    schoolClass = string.Empty;
+            }
+        }
 
+        private string tag;
         /// <summary>
         /// The tag found in the second table
         /// Used to assign to a lesson
         /// </summary>
         public string Tag
-        { get; set; }
+        {
+            get { return tag; }
+            set
+            {
+                if (value != null)
+                    tag = value.Trim().ToLower();
+                else
+                    tag = string.Empty;
+            }
+        }
 
         public Class(string name, string teacher, string tag, string schoolClass)
         {
@@ -47,12 +100,12 @@ namespace StundenplanImport.Model.GesaHu
             return base.Equals(obj);
         }
 
-        private bool Equals(Class other)
+        public bool Equals(Class other)
         {
             if (other == null)
                 return false;
 
-            return Name == other.Name && Room == other.Room && Teacher == other.Teacher && SchoolClass == other.SchoolClass && Tag == other.Tag;
+            return Name.Trim() == other.Name.Trim() && Room.Trim() == other.Room.Trim() && Teacher.Trim() == other.Teacher.Trim() && SchoolClass.Trim() == other.SchoolClass.Trim();
         }
     }
 }

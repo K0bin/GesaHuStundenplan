@@ -8,19 +8,39 @@ namespace StundenplanImport.Model.GesaHu
 {
     public class Lesson
     {
+        private string name;
         /// <summary>
         /// Name thats found on the web timetable
         /// Might be wrong when theres multiple classes at the same spot (FR/LA)
         /// </summary>
         public string Name
-        { get; set; }
+        {
+            get { return name; }
+            set
+            {
+                if (value != null)
+                    name = value.Trim().ToLower();
+                else
+                    name = string.Empty;
+            }
+        }
 
+        private string teacher;
         /// <summary>
         /// Teacher thats found on the web timetable
         /// Might be wrong when theres multiple classes at the same spot (FR/LA; a,b,c Kurs)
         /// </summary>
         public string Teacher
-        { get; set; }
+        {
+            get { return teacher; }
+            set
+            {
+                if (value != null)
+                    teacher = value.Trim().ToLower();
+                else
+                    teacher = string.Empty;
+            }
+        }
 
         /// <summary>
         /// The nth lesson of the day
@@ -34,11 +54,21 @@ namespace StundenplanImport.Model.GesaHu
         public int Duration
         { get; set; }
 
+        private string schoolClass;
         /// <summary>
         /// The class (for teacher timetables)
         /// </summary>
         public string SchoolClass
-        { get; set; }
+        {
+            get { return schoolClass; }
+            set
+            {
+                if (value != null)
+                    schoolClass = value.Trim().ToLower();
+                else
+                    schoolClass = string.Empty;
+            }
+        }
 
         /// <summary>
         /// The tag found on the web timetable
@@ -46,6 +76,9 @@ namespace StundenplanImport.Model.GesaHu
         /// </summary>
         public List<string> Tags
         { get; set; } = new List<string>();
+
+        public List<Class> Classes
+        { get; set; } = new List<Class>();
         
         public Lesson(DayOfWeek dayOfWeek, int number, string name, int duration = 1)
         {

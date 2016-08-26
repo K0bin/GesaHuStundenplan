@@ -1,90 +1,80 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Bearbeiten";
 }
 
 @using StundenplanImport.Model.GesaHu;
 @using StundenplanImport.Model;
 
-<table class="table table-bordered timetable">
-    <thead>
-        <tr>
-            <th></th>
-            <th>Montag</th>
-            <th>Dienstag</th>
-            <th>Mittwoch</th>
-            <th>Donnerstag</th>
-            <th>Freitag</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            for (int lessonRow = 0; lessonRow < 10; lessonRow++)
-            {
-                <tr>
-                    <td>@(lessonRow + 1)</td>
-                    @for(int dayColumn = 0; dayColumn < 5; dayColumn++)
-                    {
-                        bool hasLesson = false;
-                        var lessons = (List<Lesson>)ViewData["Lessons"];
-                        var classes = (List<Class>)ViewData["Classes"];
-                        var kind = (TimetableKind)ViewData["Kind"];
-                        foreach (var lesson in lessons)
+@model StundenplanImport.Model.ViewModel.EditViewModel
+
+<form asp-controller="Home" asp-action="Publish" method="post">
+    <table class="table table-bordered timetable">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Montag</th>
+                <th>Dienstag</th>
+                <th>Mittwoch</th>
+                <th>Donnerstag</th>
+                <th>Freitag</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int lessonCount = 0;
+                for (int lessonRow = 0; lessonRow < 10; lessonRow++)
+                {
+                    <tr>
+                        <td>@(lessonRow + 1)</td>
+                        @for (int dayColumn = 0; dayColumn < 5; dayColumn++)
                         {
-                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
-                            if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow)
+                            bool hasLesson = false;
+                            foreach (var lesson in Model.Lessons)
                             {
-                                    <td rowspan="@lesson.Duration.ToString()">
-                                        <a href="javascript:void(0)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                                        <span class="subject">@lesson.Name<br />@((kind == TimetableKind.Teacher) ? lesson.SchoolClass : lesson.Teacher)</span>
-                                        @if (lesson.Tags.Count > 0 && classes != null)
+                                var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
+                                if (lesson.Day == dayOfWeek && lesson.Number == lessonRow)
+                                {
+                                    <td rowspan="@lesson.Duration.ToString()" id="cell-@(lessonCount)">
+                                        <a id="" href="javascript:void(0)" onclick="onLessonRemoved(@(lessonCount));"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+
+                                        <span class="subject">@((lesson.Classes.Count == 1) ? lesson.Classes[0].Name : lesson.Name)<br />@((lesson.Classes.Count == 1) ? lesson.Classes[0].Teacher : lesson.TeacherOrSchoolClass)</span>
+                                        @if (lesson.Classes.Count > 1)
                                         {
-                                            var relevantClasses = new List<Class>();
-                                            foreach (var _class in classes)
-                                            {
-                                                bool isForClass = true;
-                                                if (ViewData.ContainsKey("SchoolClass") && ViewData.ContainsKey("SchoolYear") && !string.IsNullOrWhiteSpace(_class.SchoolClass))
+                                            <select id="select-@(lessonCount)" class="selectpicker" onchange="onLessonClassSelected(@(lessonCount));">
+                                                @foreach (var _class in lesson.Classes)
                                                 {
-                                                    isForClass = _class.SchoolClass.Contains((char)ViewData["SchoolClass"]) && _class.SchoolClass.Contains((string)ViewData["SchoolYear"]);
+                                                    <option value="@_class.ShortName-@_class.ShortTeacher-@_class.Room">@_class.Name @_class.Teacher @_class.Room</option>
                                                 }
-
-                                                if (lesson.Tags.Contains(_class.Tag) && isForClass)
-                                                {
-                                                    relevantClasses.Add(_class);
-                                                }
-                                            }
-
-                                            if (relevantClasses.Count > 0)
-                                            {
-                                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu@(lessonRow * 10 + dayColumn)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                    Kurs
-                                                    <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu@(lessonRow * 10 + dayColumn)">
-                                                    @foreach (var _class in relevantClasses)
-                                                    {
-                                                        <li>@_class.Teacher</li>
-                                                    }
-                                                </ul>
-                                            }
+                                            </select>
                                         }
+                                        <input name="lessons[@(lessonCount)].Day" type="hidden" value="@lesson.Day" />
+                                        <input name="lessons[@(lessonCount)].Number" type="hidden" value="@lesson.Number" />
+                                        <input name="lessons[@(lessonCount)].Duration" type="hidden" value="@lesson.Duration" />
+                                        <input name="lessons[@(lessonCount)].Name" type="hidden" value="@lesson.Name" id="name-@(lessonCount)" />
+                                        <input name="lessons[@(lessonCount)].TeacherOrSchoolClass" type="hidden" value="@lesson.TeacherOrSchoolClass" id="teacher-@(lessonCount)" />
+                                        <input name="lessons[@(lessonCount)].Room" type="hidden" value="@(lesson.Classes.Count > 0 ? lesson.Classes[0].Room : string.Empty)" id="room-@(lessonCount)" />
                                     </td>
-                                hasLesson = true;
-                            }
-                            else if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1)
-                            {
-                                hasLesson = true;
-                            }
-                        }
 
-                        if (!hasLesson)
-                        {
-                            <td></td>
+                                    lessonCount++;
+                                    hasLesson = true;
+                                }
+                                else if (lesson.Day == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1)
+                                {
+                                    hasLesson = true;
+                                }
+                            }
+
+                            if (!hasLesson)
+                            {
+                                <td></td>
+                            }
                         }
+                    </tr>
                     }
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+                }
+        </tbody>
+    </table>
+
+    <input type="submit" />
+
+</form>
