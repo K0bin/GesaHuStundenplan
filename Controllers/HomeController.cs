@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using StundenplanImport.Model.GesaHu;
+using StundenplanImport.Model;
 
 namespace StundenplanImport.Controllers
 {
@@ -20,22 +21,22 @@ namespace StundenplanImport.Controllers
 
         public async Task<IActionResult> Edit(string @class, string student, string teacher)
         {
-            TimetableLoader.Kind kind = TimetableLoader.Kind.Class;
+            TimetableKind kind = TimetableKind.Class;
             string element = "";
 
             if (!string.IsNullOrWhiteSpace(@class))
             {
-                kind = TimetableLoader.Kind.Class;
+                kind = TimetableKind.Class;
                 element = @class;
             }
             else if (!string.IsNullOrWhiteSpace(teacher))
             {
-                kind = TimetableLoader.Kind.Teacher;
+                kind = TimetableKind.Teacher;
                 element = teacher;
             }
             else if (!string.IsNullOrWhiteSpace(student))
             {
-                kind = TimetableLoader.Kind.Student;
+                kind = TimetableKind.Student;
                 element = student;
             }
 
@@ -46,7 +47,8 @@ namespace StundenplanImport.Controllers
 
             ViewData["Lessons"] = lessons;
             ViewData["Classes"] = classes;
-            if (kind == TimetableLoader.Kind.Class)
+            ViewData["Kind"] = kind;
+            if (kind == TimetableKind.Class)
             {
                 var elementParts = element.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (elementParts.Length >= 1)

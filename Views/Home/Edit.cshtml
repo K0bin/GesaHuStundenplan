@@ -5,6 +5,7 @@
 }
 
 @using StundenplanImport.Model.GesaHu;
+@using StundenplanImport.Model;
 
 <table class="table table-bordered timetable">
     <thead>
@@ -24,18 +25,19 @@
                 <tr>
                     <td>@(lessonRow + 1)</td>
                     @for(int dayColumn = 0; dayColumn < 5; dayColumn++)
+                    {
+                        bool hasLesson = false;
+                        var lessons = (List<Lesson>)ViewData["Lessons"];
+                        var classes = (List<Class>)ViewData["Classes"];
+                        var kind = (TimetableKind)ViewData["Kind"];
+                        foreach (var lesson in lessons)
                         {
-                            bool hasLesson = false;
-                            var lessons = (List<Lesson>)ViewData["Lessons"];
-                            var classes = (List<Class>)ViewData["Classes"];
-                            foreach (var lesson in lessons)
+                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
+                            if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow)
                             {
-                                var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
-                                if (lesson.DayOfWeek == dayOfWeek && lesson.Number == lessonRow)
-                                {
                                     <td rowspan="@lesson.Duration.ToString()">
                                         <a href="javascript:void(0)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                                        <span class="subject">@lesson.Name<br />@lesson.Teacher</span>
+                                        <span class="subject">@lesson.Name<br />@((kind == TimetableKind.Teacher) ? lesson.SchoolClass : lesson.Teacher)</span>
                                         @if (lesson.Tags.Count > 0 && classes != null)
                                         {
                                             var relevantClasses = new List<Class>();
@@ -60,8 +62,8 @@
                                                     <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu@(lessonRow * 10 + dayColumn)">
-                                                    @foreach(var _class in relevantClasses)
-                                                    { 
+                                                    @foreach (var _class in relevantClasses)
+                                                    {
                                                         <li>@_class.Teacher</li>
                                                     }
                                                 </ul>

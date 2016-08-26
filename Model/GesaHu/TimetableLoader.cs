@@ -11,49 +11,30 @@ namespace StundenplanImport.Model.GesaHu
 {
     public class TimetableLoader
     {
-        public enum Kind
-        {
-            Student,
-            Teacher,
-            Class
-        }
-
-        public enum Week
-        {
-            Even = 0,
-            Odd = 1
-        }
-
-        public enum Semester
-        {
-            First = 0,
-            Second = 1
-        }
-
-        private bool isOberstufe = false;
+        private TimetableKind kind;
 
         private Uri uri;
 
-        public TimetableLoader(Kind kind, string element, Week week = Week.Even, Semester semester = Semester.First)
+        public TimetableLoader(TimetableKind kind, string element, Week week = Week.Even, Semester semester = Semester.First)
         {
             int table = 4 + (int)week + (int)semester * 2;
             int index = 0;
             char kindChar = 'c';
+            this.kind = kind;
 
-            switch(kind)
+            switch (kind)
             {
-                case Kind.Class:
+                case TimetableKind.Class:
                     index = Array.IndexOf(Names.Classes, element);
                     kindChar = 'c';
                     break;
 
-                case Kind.Student:
+                case TimetableKind.Student:
                     index = Array.IndexOf(Names.Students, element);
                     kindChar = 's';
-                    isOberstufe = true;
                     break;
 
-                case Kind.Teacher:
+                case TimetableKind.Teacher:
                     index = Array.IndexOf(Names.Teachers, element);
                     kindChar = 't';
                     break;
@@ -135,7 +116,7 @@ namespace StundenplanImport.Model.GesaHu
             {
                 var classesTable = tables.ElementAt(1);
 
-                if(!isOberstufe)
+                if(kind == TimetableKind.Class)
                     classes = ParseClassesTable(classesTable);
 
             }
@@ -165,7 +146,7 @@ namespace StundenplanImport.Model.GesaHu
             int duration = int.Parse(td.Attributes["rowspan"].Value) / 2;
 
             string tag = string.Empty;
-            if (!isOberstufe)
+            if (kind == TimetableKind.Class)
             {
                 if (rows.Count() > 1)
                     tag = rows.ElementAt(1).InnerText.Trim();
@@ -186,7 +167,13 @@ namespace StundenplanImport.Model.GesaHu
 
             if (!string.IsNullOrWhiteSpace(tag))
                 lesson.Tags.Add(tag);
-            
+
+            if (kind == TimetableKind.Teacher)
+            {
+                if (rows.Count() > 1)
+                    lesson.SchoolClass = rows.ElementAt(1).InnerText.Trim();
+            }
+
             return lesson;
         }
 
