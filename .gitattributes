@@ -1,3 +1,5 @@
 * text=auto
 project.json text eol=lf encoding=utf-8
 wwwroot/lib/bootstrap/dist/css/bootstrap-material.min.css text eol=lf encoding=utf-8
+README.md text eol=lf encoding=utf-8
+LICENSE text eol=lf encoding=utf-8
