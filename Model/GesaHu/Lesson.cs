@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StundenplanImport.Model.GesaHu
 {
-    public class Lesson
+    public class Lesson : IEquatable<Lesson>
     {
         private string name;
         /// <summary>
@@ -52,6 +52,9 @@ namespace StundenplanImport.Model.GesaHu
         { get; set; }
 
         public int Duration
+        { get; set; }
+
+        public Week Week
         { get; set; }
 
         private string schoolClass;
@@ -130,6 +133,19 @@ namespace StundenplanImport.Model.GesaHu
         {
             var values = get.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             return null;
+        }
+
+        public override bool Equals(object other)
+        {
+            if (other is Lesson)
+                return Equals((Lesson)other);
+
+            return base.Equals(other);
+        }
+
+        public bool Equals(Lesson other)
+        {
+            return other != null && Name == other.Name && Teacher == other.Teacher && Duration == other.Duration && Number == other.Number && DayOfWeek == other.DayOfWeek && SchoolClass == other.SchoolClass;
         }
     }
 }

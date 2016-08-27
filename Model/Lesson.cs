@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 namespace StundenplanImport.Model
 {
     public class Lesson
-   { 
+   {
+        public Week Week
+        { get; set; }
+
         public DayOfWeek Day
         { get; set; }
 

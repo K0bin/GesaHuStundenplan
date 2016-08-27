@@ -53,7 +53,7 @@ namespace StundenplanImport.Controllers
                 {
                     classVMs.Add(new ClassViewModel(_class.Name, _class.Teacher, _class.Room));
                 }
-                lessonVMs.Add(new LessonViewModel(lesson.DayOfWeek, lesson.Number, lesson.Duration, lesson.Name, kind == TimetableKind.Teacher ? lesson.SchoolClass : lesson.Teacher, classVMs));
+                lessonVMs.Add(new LessonViewModel(lesson.DayOfWeek, lesson.Number, lesson.Duration, lesson.Name, kind == TimetableKind.Teacher ? lesson.SchoolClass : lesson.Teacher, lesson.Week, classVMs));
             }
 
             var viewModel = new EditViewModel(kind, element, lessonVMs);

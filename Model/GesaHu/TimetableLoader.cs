@@ -13,23 +13,23 @@ namespace StundenplanImport.Model.GesaHu
     {
         private TimetableKind kind;
 
-        private Uri uri;
+        private int timetableIndex = 0;
+        private char kindChar = 'c';
+        private Semester semester;
 
         private bool hasSchoolClass = false;
         private string schoolYear;
         private char schoolClass;
 
-        public TimetableLoader(TimetableKind kind, string element, Week week = Week.Even, Semester semester = Semester.First)
+        public TimetableLoader(TimetableKind kind, string element, Semester semester = Semester.First)
         {
-            int table = 4 + (int)week + (int)semester * 2;
-            int index = 0;
-            char kindChar = 'c';
             this.kind = kind;
+            this.semester = semester;
 
             switch (kind)
             {
                 case TimetableKind.Class:
-                    index = Array.IndexOf(Names.Classes, element);
+                    timetableIndex = Array.IndexOf(Names.Classes, element);
                     kindChar = 'c';
 
                     var elementParts = element.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -42,33 +42,68 @@ namespace StundenplanImport.Model.GesaHu
                     break;
 
                 case TimetableKind.Student:
-                    index = Array.IndexOf(Names.Students, element);
+                    timetableIndex = Array.IndexOf(Names.Students, element);
                     kindChar = 's';
                     break;
 
                 case TimetableKind.Teacher:
-                    index = Array.IndexOf(Names.Teachers, element);
+                    timetableIndex = Array.IndexOf(Names.Teachers, element);
                     kindChar = 't';
                     break;
             }
 
             //Non 0-based
-            index += 1;
+            timetableIndex += 1;
+        }
 
-            string url = String.Format("http://gesahui.de/schueler/lsimon1344/stundenplan/stupla_untis/0{0}/{1}/{1}{2}.htm",table, kindChar, index.ToString("D5"));
-            uri = new Uri(url);
+        private Uri BuildUri(Week week = Week.Even, Semester semester = Semester.First)
+        {
+            if(week == Week.Both)
+                throw new Exception("Can't build the uri for both weeks.");
+
+            int table = 4 + (int)week + (int)semester * 2;
+            string url = String.Format("http://gesahui.de/schueler/lsimon1344/stundenplan/stupla_untis/0{0}/{1}/{1}{2}.htm", table, kindChar, timetableIndex.ToString("D5"));
+            return new Uri(url);
         }
 
         public async Task<List<Lesson>> LoadAsync()
         {
-            var client = new HttpClient();
-            var bytes = await client.GetByteArrayAsync(uri);
-            var html = Encoding.GetEncoding("ISO-8859-1").GetString(bytes);
+            var evenClient = new HttpClient();
+            var evenBytes = await evenClient.GetByteArrayAsync(BuildUri(Week.Even));
+            var evenHtml = Encoding.GetEncoding("ISO-8859-1").GetString(evenBytes);
 
-            return Parse(html);
+            var evenLessons = Parse(evenHtml, Week.Even);
+
+            var oddClient = new HttpClient();
+            var oddBytes = await oddClient.GetByteArrayAsync(BuildUri(Week.Odd));
+            var oddHtml = Encoding.GetEncoding("ISO-8859-1").GetString(oddBytes);
+
+            var oddLessons = Parse(oddHtml, Week.Odd);
+
+            var lessons = new List<Lesson>();
+            foreach(var evenLesson in evenLessons)
+            {
+                lessons.Add(evenLesson);
+            }
+            foreach(var oddLesson in oddLessons)
+            {
+                Lesson existingLesson = null;
+                foreach (var evenLesson in evenLessons)
+                {
+                    if (evenLesson.Equals(oddLesson))
+                        existingLesson = evenLesson;
+                }
+
+                if (existingLesson == null)
+                    lessons.Add(oddLesson);
+                else
+                    existingLesson.Week = Week.Both;
+            }
+
+            return lessons;
         }
 
-        private List<Lesson> Parse(string html)
+        private List<Lesson> Parse(string html, Week week)
         {
             var lessons = new List<Lesson>();
             var doc = new HtmlDocument();
@@ -113,8 +148,11 @@ namespace StundenplanImport.Model.GesaHu
                             }
 
                             var parsedLesson = ParseLesson(column, (DayOfWeek)((int)DayOfWeek.Monday + dayIndex), number, previousLesson);
-                            if(parsedLesson != null)
+                            if (parsedLesson != null)
+                            {
+                                parsedLesson.Week = week;
                                 lessons.Add(parsedLesson);
+                            }
                         }
                         columnIndex++;
                     }
@@ -250,54 +288,57 @@ namespace StundenplanImport.Model.GesaHu
                 var cells = row.Elements("td");
                 var cellIndex = 0;
 
-                foreach(var cell in cells)
+                foreach (var cell in cells)
                 {
                     var text = WebUtility.HtmlDecode(cell.InnerText).Trim();
-                    if (!string.IsNullOrWhiteSpace(text))
+                    switch (cellIndex % 6)
                     {
-                        switch (cellIndex % 6)
-                        {
-                            case 0:
-                                if (name != string.Empty)
-                                {
-                                    var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
+                        case 0:
+                            if (name != string.Empty)
+                            {
+                                var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
 
-                                    if (!string.IsNullOrWhiteSpace(room))
-                                        _class.Room = room;
+                                if (!string.IsNullOrWhiteSpace(room))
+                                    _class.Room = room;
 
-                                    if(!classes.Contains(_class))
-                                        classes.Add(_class);
+                                if (!classes.Contains(_class))
+                                    classes.Add(_class);
 
-                                    teacher = string.Empty;
-                                    schoolClass = string.Empty;
-                                    name = string.Empty;
-                                    room = string.Empty;
-                                }
+                                teacher = string.Empty;
+                                schoolClass = string.Empty;
+                                name = string.Empty;
+                                room = string.Empty;
+                            }
 
+                            if (!string.IsNullOrWhiteSpace(text))
+                            {
                                 //Tag
                                 if (cellIndex > 5)
                                     rightTag = text;
                                 else
                                     leftTag = text;
-                                break;
+                            }
+                            break;
 
-                            case 1:
-                                if (name != string.Empty)
-                                {
-                                    var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
+                        case 1:
+                            if (name != string.Empty)
+                            {
+                                var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
 
-                                    if (!string.IsNullOrWhiteSpace(room))
-                                        _class.Room = room;
+                                if (!string.IsNullOrWhiteSpace(room))
+                                    _class.Room = room;
 
-                                    if (!classes.Contains(_class))
-                                        classes.Add(_class);
+                                if (!classes.Contains(_class))
+                                    classes.Add(_class);
 
-                                    teacher = string.Empty;
-                                    schoolClass = string.Empty;
-                                    name = string.Empty;
-                                    room = string.Empty;
-                                }
+                                teacher = string.Empty;
+                                schoolClass = string.Empty;
+                                name = string.Empty;
+                                room = string.Empty;
+                            }
 
+                            if (!string.IsNullOrWhiteSpace(text))
+                            {
                                 text = text.Replace(" ", "");
                                 var parts = text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                                 if (parts.Length >= 1)
@@ -306,12 +347,13 @@ namespace StundenplanImport.Model.GesaHu
                                     name = parts[1].Trim();
                                 if (parts.Length >= 3)
                                     room = parts[2].Trim();
-                                break;
+                            }
+                            break;
 
-                            case 2:
+                        case 2:
+                            if (!string.IsNullOrWhiteSpace(text))
                                 schoolClass = text;
-                                break;
-                        }
+                            break;
                     }
 
                     cellIndex++;

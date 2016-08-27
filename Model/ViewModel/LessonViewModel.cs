@@ -32,13 +32,17 @@ namespace StundenplanImport.Model.ViewModel
         public string ShortTeacher
         { get; private set; }
 
-        public LessonViewModel(DayOfWeek day, int number, int duration, string name, string teacherOrSchoolClass, List<ClassViewModel> classes = null)
+        public Week Week
+        { get; private set; }
+
+        public LessonViewModel(DayOfWeek day, int number, int duration, string name, string teacherOrSchoolClass, Week week = Week.Both, List<ClassViewModel> classes = null)
         {
             Day = day;
             Number = number;
             Duration = duration;
             Name = Names.ResolveSubject(name);
             TeacherOrSchoolClass = Names.ResolveTeacher(teacherOrSchoolClass);
+            Week = week;
 
             if (classes != null)
                 Classes = classes.ToImmutableList();

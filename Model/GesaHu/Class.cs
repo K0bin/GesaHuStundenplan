@@ -105,7 +105,16 @@ namespace StundenplanImport.Model.GesaHu
             if (other == null)
                 return false;
 
-            return Name.Trim() == other.Name.Trim() && Room.Trim() == other.Room.Trim() && Teacher.Trim() == other.Teacher.Trim() && SchoolClass.Trim() == other.SchoolClass.Trim();
+            bool isParsed = true;
+            int tagNumber = 0;
+            int otherTagNumber = 0;
+            if (Tag.Length <= 1 || int.TryParse(Tag.Substring(0, Tag.Length - 1), out tagNumber))
+                isParsed = false;
+
+            if (other.Tag.Length <= 1 || int.TryParse(other.Tag.Substring(0, other.Tag.Length - 1), out otherTagNumber))
+                isParsed = false;
+
+            return other != null && Name.Trim() == other.Name.Trim() && Room.Trim() == other.Room.Trim() && Teacher.Trim() == other.Teacher.Trim() && SchoolClass.Trim() == other.SchoolClass.Trim() && (isParsed && Math.Abs(tagNumber - otherTagNumber) <= 1);
         }
     }
 }

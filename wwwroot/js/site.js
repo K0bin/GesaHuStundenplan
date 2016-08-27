@@ -26,8 +26,20 @@ function onLessonClassSelected(lesson) {
     }
 }
 
-function onChangeRadioButton() {
-    if (!('#semester-radio-1').prop('checked')) {
+function onChangeWeekRadioButton() {
+    if ($('#week-radio-1').prop('checked')) {
+        $('.week_even').show();
+        $('.week_odd').hide();
+    } else {
+        $('.week_even').hide();
+        $('.week_odd').show();
+    }
+}
+
+function onChangeSemesterRadioButton() {
+    if (!$('#semester-radio-1').prop('checked')) {
 
     }
 }
+
+$(function () { $('.week_odd').hide(); });

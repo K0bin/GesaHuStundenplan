@@ -7,6 +7,26 @@
 
 @model StundenplanImport.Model.ViewModel.EditViewModel
 
+<div class="row">
+    <div class="col-md-3 col-xs-6">
+        <h5>Woche</h5>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <div class="radio">
+            <label>
+                <input type="radio" name="week" id="week-radio-1" value="1" checked="" onchange="onChangeWeekRadioButton();">
+                Gerade Woche
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="week" id="week-radio-2" value="2" onchange="onChangeWeekRadioButton();">
+                Ungerade Woche
+            </label>
+        </div>
+    </div>
+</div>
+
 <form asp-controller="Home" asp-action="ExportIcf" method="post">
     <table class="table table-bordered timetable">
         <thead>
@@ -26,15 +46,19 @@
                 {
                     <tr>
                         <td>@(lessonRow + 1)</td>
+                        @{
+                            Week previousWeek = Week.None;
+                        }
                         @for (int dayColumn = 0; dayColumn < 5; dayColumn++)
                         {
-                            bool hasLesson = false;
+                            Week week = Week.None;
+
                             foreach (var lesson in Model.Lessons)
                             {
                                 var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
                                 if (lesson.Day == dayOfWeek && lesson.Number == lessonRow)
                                 {
-                                    <td rowspan="@lesson.Duration.ToString()" id="cell-@(lessonCount)">
+                                    <td rowspan="@lesson.Duration.ToString()" id="cell-@(lessonCount)" class="week_@lesson.Week.ToString().ToLower()">
                                         <a id="" href="javascript:void(0)" onclick="onLessonRemoved(@(lessonCount));"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 
                                         <span class="subject">@((lesson.Classes.Count == 1) ? lesson.Classes[0].Name : lesson.Name)<br />@((lesson.Classes.Count == 1) ? lesson.Classes[0].Teacher : lesson.TeacherOrSchoolClass)</span>
@@ -47,6 +71,8 @@
                                                 }
                                             </select>
                                         }
+
+                                        <input name="lessons[@(lessonCount)].Week" type="hidden" value="@lesson.Week" />
                                         <input name="lessons[@(lessonCount)].Day" type="hidden" value="@lesson.Day" />
                                         <input name="lessons[@(lessonCount)].Number" type="hidden" value="@lesson.Number" />
                                         <input name="lessons[@(lessonCount)].Duration" type="hidden" value="@lesson.Duration" />
@@ -56,17 +82,47 @@
                                     </td>
 
                                     lessonCount++;
-                                    hasLesson = true;
+
+                                    if (week != Week.None)
+                                    {
+                                        week = Week.Both;
+                                    }
+                                    else
+                                    {
+                                        week = lesson.Week;
+                                    }
                                 }
-                                else if (lesson.Day == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1)
+                                else if (lesson.Day == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1 )
                                 {
-                                    hasLesson = true;
+                                    if (week != Week.None)
+                                    {
+                                        week = Week.Both;
+                                    }
+                                    else
+                                    {
+                                        week = lesson.Week;
+                                    }
                                 }
                             }
 
-                            if (!hasLesson)
+                            if (week != Week.Both)
                             {
-                                <td></td>
+                                if (week == Week.None)
+                                {
+                                    <td>@dayColumn @lessonRow</td>
+                                }
+                                else
+                                {
+                                    if (week == Week.Even)
+                                    {
+                                        <td class="week_odd">@dayColumn @lessonRow</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="week_even">@dayColumn @lessonRow</td>
+                                    }
+                                }
+
                             }
                         }
                     </tr>
