@@ -279,7 +279,7 @@ namespace StundenplanImport.Model.GesaHu
             var leftTag = string.Empty;
             var rightTag = string.Empty;
             var teacher = string.Empty;
-            var schoolClass = string.Empty;
+            var _schoolClass = string.Empty;
             var name = string.Empty;
             var room = string.Empty;
 
@@ -303,7 +303,7 @@ namespace StundenplanImport.Model.GesaHu
                         case 0:
                             if (name != string.Empty)
                             {
-                                var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
+                                var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, _schoolClass);
 
                                 if (!string.IsNullOrWhiteSpace(room))
                                     _class.Room = room;
@@ -312,7 +312,7 @@ namespace StundenplanImport.Model.GesaHu
                                     classes.Add(_class);
 
                                 teacher = string.Empty;
-                                schoolClass = string.Empty;
+                                _schoolClass = string.Empty;
                                 name = string.Empty;
                                 room = string.Empty;
                             }
@@ -330,7 +330,7 @@ namespace StundenplanImport.Model.GesaHu
                         case 1:
                             if (name != string.Empty)
                             {
-                                var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, schoolClass);
+                                var _class = new Class(name, teacher, cellIndex > 5 ? leftTag : rightTag, _schoolClass);
 
                                 if (!string.IsNullOrWhiteSpace(room))
                                     _class.Room = room;
@@ -339,7 +339,7 @@ namespace StundenplanImport.Model.GesaHu
                                     classes.Add(_class);
 
                                 teacher = string.Empty;
-                                schoolClass = string.Empty;
+                                _schoolClass = string.Empty;
                                 name = string.Empty;
                                 room = string.Empty;
                             }
@@ -359,7 +359,7 @@ namespace StundenplanImport.Model.GesaHu
 
                         case 2:
                             if (!string.IsNullOrWhiteSpace(text))
-                                schoolClass = text;
+                                _schoolClass = text;
                             break;
                     }
 
