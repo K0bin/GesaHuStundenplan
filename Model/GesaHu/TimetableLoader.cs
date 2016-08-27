@@ -124,22 +124,29 @@ namespace StundenplanImport.Model.GesaHu
                     var columns = row.Elements("td");
                     foreach (var column in columns)
                     {
-                        if (columnIndex != 0 && column.HasAttributes && column.Attributes["colspan"]?.Value?.Trim() == "12" && !string.IsNullOrWhiteSpace(column.InnerText))
+                        if(columnIndex == 0)
                         {
-                            var number = rowIndex / 2;
-                            Lesson previousLesson = null;
-                            var dayIndex = (columnIndex - 1);
-                            var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
-                            foreach (var lesson in lessons)
-                            {
-                                if (lesson.DayOfWeek == dayOfWeek && lesson.Number == number - 1 && lesson.Duration > 1)
-                                {
-                                    columnIndex++;
-                                    dayIndex = (columnIndex - 1);
-                                    dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
-                                }
-                            }
+                            columnIndex++;
+                            continue;
+                        }
 
+                        var number = rowIndex / 2;
+                        Lesson previousLesson = null;
+                        var dayIndex = (columnIndex - 1);
+                        var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
+
+                        foreach (var lesson in lessons)
+                        {
+                            if (lesson.DayOfWeek == dayOfWeek && lesson.Number == number - 1 && lesson.Duration > 1)
+                            {
+                                columnIndex++;
+                                dayIndex = (columnIndex - 1);
+                                dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
+                            }
+                        }
+
+                        if (column.HasAttributes && column.Attributes["colspan"]?.Value?.Trim() == "12" && !string.IsNullOrWhiteSpace(column.InnerText))
+                        {
                             // Find previous lesson to fix two lessons instead of a double
                             foreach (var lesson in lessons)
                             {
