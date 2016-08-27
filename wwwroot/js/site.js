@@ -26,3 +26,8 @@ function onLessonClassSelected(lesson) {
     }
 }
 
+function onChangeRadioButton() {
+    if (!('#semester-radio-1').prop('checked')) {
+
+    }
+}

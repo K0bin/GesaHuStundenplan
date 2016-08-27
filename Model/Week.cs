@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace StundenplanImport.Model
 {
-    public enum TimetableKind
+    public enum Week
     {
-        Student,
-        Teacher,
-        Class
+        Even = 0,
+        Odd = 1
     }
 }

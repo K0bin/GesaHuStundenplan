@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using StundenplanImport.Model.GesaHu;
 using StundenplanImport.Model;
 using StundenplanImport.Model.ViewModel;
+using StundenplanImport.Model.Export;
 
 namespace StundenplanImport.Controllers
 {
@@ -55,7 +56,7 @@ namespace StundenplanImport.Controllers
                 lessonVMs.Add(new LessonViewModel(lesson.DayOfWeek, lesson.Number, lesson.Duration, lesson.Name, kind == TimetableKind.Teacher ? lesson.SchoolClass : lesson.Teacher, classVMs));
             }
 
-            var viewModel = new EditViewModel(kind, lessonVMs);
+            var viewModel = new EditViewModel(kind, element, lessonVMs);
 
             return View(viewModel);
         }
@@ -63,6 +64,14 @@ namespace StundenplanImport.Controllers
         public async Task<IActionResult> Publish(ICollection<Model.Lesson> lessons)
         {
             return View();
+        }
+
+        public IActionResult ExportIcf(string timetableName, ICollection<Model.Lesson> lessons)
+        {
+            var exporter = new ExporterICalendar();
+            //var file = exporter.Exportsn(timetableName, lessons);
+
+            return View("Publish");
         }
 
         public IActionResult Error()

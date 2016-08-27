@@ -1,14 +1,37 @@
 ﻿@{
     ViewData["Title"] = "Startseite";
 }
+@using StundenplanImport.Model
+
 <div class="row">
     <div class="col-md-12">
         <h3>Wähle deinen Stundenplan aus:</h3>
     </div>
 </div>
+
 <div class="row">
     <div class="col-md-3 col-xs-6">
-        <h5>Klasse</h5>
+        <h5>Halbjahr</h5>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <div class="radio">
+            <label>
+                <input type="radio" name="semester" id="semester-radio-1" value="1" checked="">
+                Erstes Halbjahr
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="semester" id="semester-radio-2" value="2">
+                Zweites Halbjahr
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 col-xs-6">
+        <h4>Klasse</h4>
     </div>
     <div class="col-md-3 col-xs-6">
         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

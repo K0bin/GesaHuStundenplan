@@ -11,12 +11,16 @@ namespace StundenplanImport.Model.ViewModel
         public TimetableKind Kind
         { get; private set; }
 
+        public string Element
+        { get; private set; }
+
         public ImmutableList<LessonViewModel> Lessons
         { get; private set; }
 
-        public EditViewModel(TimetableKind kind, List<LessonViewModel> lessons)
+        public EditViewModel(TimetableKind kind, string element, List<LessonViewModel> lessons)
         {
             Kind = kind;
+            Element = element;
             Lessons = lessons.ToImmutableList();
         }
     }

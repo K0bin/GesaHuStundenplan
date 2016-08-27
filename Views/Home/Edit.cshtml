@@ -7,7 +7,7 @@
 
 @model StundenplanImport.Model.ViewModel.EditViewModel
 
-<form asp-controller="Home" asp-action="Publish" method="post">
+<form asp-controller="Home" asp-action="ExportIcf" method="post">
     <table class="table table-bordered timetable">
         <thead>
             <tr>
@@ -75,6 +75,7 @@
         </tbody>
     </table>
 
+    <input name="timetableName" type="hidden" value="@Model.Element" />
     <input type="submit" />
 
 </form>

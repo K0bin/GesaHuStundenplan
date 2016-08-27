@@ -187,7 +187,13 @@ namespace StundenplanImport.Model.GesaHu
             if (kind == TimetableKind.Class)
             {
                 if (rows.Count() > 1)
-                    tag = rows.ElementAt(1).InnerText.Trim();
+                {
+                    var columns = rows.ElementAt(1).Elements("td");
+                    if(columns.Count() > 1)
+                        tag = columns.ElementAt(1).InnerText.Trim();
+                    else if(columns.Any())
+                        tag = columns.ElementAt(0).InnerText.Trim();
+                }
             }
 
             if (previousLesson != null && name.ToLower() == previousLesson.Name.ToLower())
