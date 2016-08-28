@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace StundenplanImport.Model
 {
-    public class Vacation
+    public class Vacation : IComparable<Vacation>
     {
         [JsonProperty]
            public string Title
@@ -26,6 +26,14 @@ namespace StundenplanImport.Model
         [JsonConverter(typeof(EpochConverter))]
         public DateTime End
         { get; private set; }
+
+        public int CompareTo(Vacation other)
+        {
+            if (other == null || other.Begin > Begin)
+                return -1;
+            else
+                return 1;
+        }
 
         public static readonly Dictionary<Bundesland, string> BundeslandShorts = new Dictionary<Bundesland, string>()
         {
@@ -61,7 +69,70 @@ namespace StundenplanImport.Model
             {
                 output.Add(JsonConvert.DeserializeObject<Vacation>(vacation.ToString()));
             }
+            output.Sort();
+
             return output;
+        }
+
+        public static async Task<Tuple<DateTime, DateTime>> GetSemesterDatesAsync(Semester semester, List<Vacation> vacations)
+        {
+            DateTime semesterStart = new DateTime();
+            DateTime semesterEnd = new DateTime();
+            var previousYearVacation = await LoadForYearAsync(Bundesland.Hessen, (DateTime.Now.Year + 1).ToString());
+            var nextYearVacations = await LoadForYearAsync(Bundesland.Hessen, (DateTime.Now.Year+1).ToString());
+
+            if (semester == Semester.Second)
+            {
+                foreach (var vacation in previousYearVacation)
+                {
+                    if (vacation.Title.StartsWith("Weihnachtsferien"))
+                    {
+                        semesterStart = vacation.End.AddDays(3);
+                    }
+                }
+            }
+
+            foreach (var vacation in vacations)
+            {
+                if (vacation.Title.StartsWith("Winterferien") && semester == Semester.Second)
+                {
+                    semesterStart = vacation.Begin.AddDays(-3);
+                }
+                if (vacation.Title.StartsWith("Sommerferien"))
+                {
+                    if (semester == Semester.First)
+                        semesterStart = vacation.End.AddDays(3);
+                    else
+                        semesterEnd = vacation.Begin.AddDays(-3);
+                }
+                if (vacation.Title.StartsWith("Weihnachtsferien") && semester == Semester.First)
+                {
+                    semesterEnd = vacation.Begin.AddDays(-3);
+                }
+            }
+
+            if (semester == Semester.First)
+            {
+                foreach (var vacation in nextYearVacations)
+                {
+                    if (vacation.Title.StartsWith("Winterferien"))
+                    {
+                        semesterEnd = vacation.Begin.AddDays(-3);
+                    }
+                }
+            }
+
+            return Tuple.Create<DateTime, DateTime>(semesterStart, semesterEnd);
+        }
+
+        public static bool IsInVacation(DateTime date, List<Vacation> vacations)
+        {
+            foreach(var vacation in vacations)
+            {
+                if (vacation.Begin >= date && vacation.End <= date)
+                    return true;
+            }
+            return false;
         }
     }
 
