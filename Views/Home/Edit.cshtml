@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<form asp-controller="Export" asp-action="GoogleCalendar" method="post">
+<form asp-controller="Export" asp-action="ICalendar" method="post">
     <table class="table table-bordered timetable">
         <thead>
             <tr>
@@ -53,7 +53,7 @@
                             foreach (var lesson in Model.Lessons)
                             {
                                 var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayColumn);
-                                if (lesson.Day == dayOfWeek && lesson.Number == lessonRow)
+                                if (lesson.Day == dayOfWeek && lesson.Period == lessonRow)
                                 {
                                     <td rowspan="@lesson.Duration.ToString()" id="cell-@(lessonCount)" class="week_@lesson.Week.ToString().ToLower()">
                                         <a id="" href="javascript:void(0)" onclick="onLessonRemoved(@(lessonCount));"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
@@ -71,11 +71,11 @@
 
                                         <input name="lessons[@(lessonCount)].Week" type="hidden" value="@lesson.Week" />
                                         <input name="lessons[@(lessonCount)].Day" type="hidden" value="@lesson.Day" />
-                                        <input name="lessons[@(lessonCount)].Number" type="hidden" value="@lesson.Number" />
+                                        <input name="lessons[@(lessonCount)].Period" type="hidden" value="@lesson.Period" />
                                         <input name="lessons[@(lessonCount)].Duration" type="hidden" value="@lesson.Duration" />
                                         <input name="lessons[@(lessonCount)].Name" type="hidden" value="@lesson.Name" id="name-@(lessonCount)" />
                                         <input name="lessons[@(lessonCount)].TeacherOrSchoolClass" type="hidden" value="@lesson.TeacherOrSchoolClass" id="teacher-@(lessonCount)" />
-                                        <input name="lessons[@(lessonCount)].Room" type="hidden" value="@(lesson.Classes.Count > 0 ? lesson.Classes[0].Room : string.Empty)" id="room-@(lessonCount)" />
+                                        <input name="lessons[@(lessonCount)].Room" type="hidden" value="@lesson.Room" id="room-@(lessonCount)" />
                                     </td>
 
                                     lessonCount++;
@@ -89,7 +89,7 @@
                                         week = lesson.Week;
                                     }
                                 }
-                                else if (lesson.Day == dayOfWeek && lesson.Number == lessonRow - 1 && lesson.Duration > 1 )
+                                else if (lesson.Day == dayOfWeek && lesson.Period == lessonRow - 1 && lesson.Duration > 1 )
                                 {
                                     if (week != Week.None)
                                     {
@@ -129,6 +129,7 @@
     </table>
 
     <input name="timetableName" type="hidden" value="@Model.Element" />
+    <input name="kind" type="hidden" value="@Model.Kind" />
     <input type="submit" />
 
 </form>

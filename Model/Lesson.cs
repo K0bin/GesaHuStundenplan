@@ -16,7 +16,7 @@ namespace StundenplanImport.Model
         { get; set; }
 
         [Required]
-        public int Number
+        public int Period
         { get; set; }
 
         public int Duration
@@ -34,7 +34,7 @@ namespace StundenplanImport.Model
 
         public override string ToString()
         {
-            return string.Format("Lesson: Day={2}, Number={3}, Duration={4}, Name={0}, Teacher={1}, Room={5}", Name, TeacherOrSchoolClass, Day, Number, Duration, Room);
+            return string.Format("Lesson: Day={2}, Number={3}, Duration={4}, Name={0}, Teacher={1}, Room={5}", Name, TeacherOrSchoolClass, Day, Period, Duration, Room);
         }
     }
 }

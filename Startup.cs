@@ -32,6 +32,8 @@ namespace StundenplanImport
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            services.AddDistributedMemoryCache();
+            services.AddSession();
             services.AddMvc();
         }
 
@@ -52,11 +54,36 @@ namespace StundenplanImport
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            /*
+            using (var stream = new FileStream("client_id.json", FileMode.Open, FileAccess.Read))
+            {
+                var secrets = GoogleClientSecrets.Load(stream).Secrets;
+
+                app.UseGoogleAuthentication(new GoogleOptions()
+                {
+                    ClientId = secrets.ClientId,
+                    ClientSecret = secrets.ClientSecret,
+                    Scope = { CalendarService.Scope.Calendar }, 
+                    SignInScheme = "Session",
+                    AuthenticationScheme = "Google",
+                });
+            }*/
+
+            app.UseSession();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+
+                /*
+                routes.MapRoute(name: "login",
+                    template: "{controller=Login}/{action=Login}/{id?}");
+                */
+
+                routes.MapRoute(name: "export",
+                    template: "{controller=Export}/{action=ICalendar}/{id?}");
             });
         }
     }

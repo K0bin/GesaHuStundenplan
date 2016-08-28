@@ -146,14 +146,14 @@ namespace StundenplanImport.Model.GesaHu
                             continue;
                         }
 
-                        var number = rowIndex / 2;
+                        var period = rowIndex / 2;
                         Lesson previousLesson = null;
                         var dayIndex = (columnIndex - 1);
                         var dayOfWeek = (DayOfWeek)((int)DayOfWeek.Monday + dayIndex);
 
                         foreach (var lesson in lessons)
                         {
-                            if (lesson.DayOfWeek == dayOfWeek && lesson.Number == number - 1 && lesson.Duration > 1)
+                            if (lesson.DayOfWeek == dayOfWeek && lesson.Period == period - 1 && lesson.Duration > 1)
                             {
                                 columnIndex++;
                                 dayIndex = (columnIndex - 1);
@@ -166,11 +166,11 @@ namespace StundenplanImport.Model.GesaHu
                             // Find previous lesson to fix two lessons instead of a double
                             foreach (var lesson in lessons)
                             {
-                                if (lesson.DayOfWeek == dayOfWeek && (lesson.Number == number - 1 || (lesson.Number == number - 2 && lesson.Duration > 2)))
+                                if (lesson.DayOfWeek == dayOfWeek && (lesson.Period == period - 1 || (lesson.Period == period - 2 && lesson.Duration > 2)))
                                     previousLesson = lesson;
                             }
 
-                            var parsedLesson = ParseLesson(column, (DayOfWeek)((int)DayOfWeek.Monday + dayIndex), number, previousLesson);
+                            var parsedLesson = ParseLesson(column, (DayOfWeek)((int)DayOfWeek.Monday + dayIndex), period, previousLesson);
                             if (parsedLesson != null)
                             {
                                 parsedLesson.Week = week;
@@ -224,7 +224,7 @@ namespace StundenplanImport.Model.GesaHu
             return lessons;
         }
 
-        private Lesson ParseLesson(HtmlNode td, DayOfWeek dayOfWeek, int number, Lesson previousLesson = null)
+        private Lesson ParseLesson(HtmlNode td, DayOfWeek dayOfWeek, int period, Lesson previousLesson = null)
         {
             if (td == null)
                 return null;
@@ -299,7 +299,7 @@ namespace StundenplanImport.Model.GesaHu
                 return null;
             }
 
-            Lesson lesson = new Lesson(dayOfWeek, number, name, duration);
+            Lesson lesson = new Lesson(dayOfWeek, period, name, duration);
             lesson.Name = name;
             lesson.Teacher = teacher;
             lesson.Room = room;

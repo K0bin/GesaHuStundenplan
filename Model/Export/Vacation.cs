@@ -18,12 +18,12 @@ namespace StundenplanImport.Model
         }
         
         [JsonProperty("beginn")]
-        [JsonConverter(typeof(JavaScriptDateTimeConverter))]
+        [JsonConverter(typeof(EpochConverter))]
         public DateTime Begin
         { get; private set; }
 
         [JsonProperty("ende")]
-        [JsonConverter(typeof(JavaScriptDateTimeConverter))]
+        [JsonConverter(typeof(EpochConverter))]
         public DateTime End
         { get; private set; }
 
@@ -50,7 +50,7 @@ namespace StundenplanImport.Model
         public static async Task<List<Vacation>> LoadForYearAsync(Bundesland bundesland, string year)
         {
             var client = new HttpClient();
-            var response = await client.GetAsync(string.Format("http://api.smartnoob.de/ferien/v1/feiertage/?bundesland={0}&jahr={1}", BundeslandShorts[bundesland], year));
+            var response = await client.GetAsync(string.Format("http://api.smartnoob.de/ferien/v1/ferien/?bundesland={0}&jahr={1}", BundeslandShorts[bundesland], year));
             var json = await response.Content.ReadAsStringAsync();
 
             JObject vacations = JObject.Parse(json);

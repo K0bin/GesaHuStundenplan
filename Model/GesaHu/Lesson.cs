@@ -45,7 +45,7 @@ namespace StundenplanImport.Model.GesaHu
         /// <summary>
         /// The nth lesson of the day
         /// </summary>
-        public int Number
+        public int Period
         { get; set; }
 
         public DayOfWeek DayOfWeek
@@ -92,7 +92,7 @@ namespace StundenplanImport.Model.GesaHu
         public Lesson(DayOfWeek dayOfWeek, int number, string name, int duration = 1)
         {
             DayOfWeek = dayOfWeek;
-            Number = number;
+            Period = number;
             Name = name;
             Duration = duration;
         }
@@ -104,7 +104,7 @@ namespace StundenplanImport.Model.GesaHu
             builder.Append(',');
             builder.Append(Teacher);
             builder.Append(',');
-            builder.Append(Number);
+            builder.Append(Period);
             builder.Append(',');
             builder.Append((int)DayOfWeek);
             builder.Append(',');
@@ -132,7 +132,7 @@ namespace StundenplanImport.Model.GesaHu
                 tags += tag;
             }
 
-            return string.Format("Lesson: Day={2}, Number={3}, Name={0}, Teacher={1}, Tag={4}", Name, Teacher, DayOfWeek, Number, tags);
+            return string.Format("Lesson: Day={2}, Number={3}, Name={0}, Teacher={1}, Tag={4}", Name, Teacher, DayOfWeek, Period, tags);
         }
 
         public static Lesson FromGetString(string get)
@@ -151,7 +151,7 @@ namespace StundenplanImport.Model.GesaHu
 
         public bool Equals(Lesson other)
         {
-            return other != null && Name == other.Name && Teacher == other.Teacher && Duration == other.Duration && Number == other.Number && DayOfWeek == other.DayOfWeek && SchoolClass == other.SchoolClass;
+            return other != null && Name == other.Name && Teacher == other.Teacher && Duration == other.Duration && Period == other.Period && DayOfWeek == other.DayOfWeek && SchoolClass == other.SchoolClass;
         }
     }
 }

@@ -18,16 +18,16 @@ namespace StundenplanImport.Model
                 if (vacation.Title.StartsWith("Sommerferien"))
                 {
                     if (semester == Semester.First)
-                        semesterStart = vacation.Begin;
+                        semesterStart = vacation.End.AddDays(3);
                     else
-                        semesterStart = vacation.End;
+                        semesterEnd = vacation.Begin.AddDays(-3);
                 }
                 if (vacation.Title.StartsWith("Weihnachtsferien"))
                 {
                     if (semester == Semester.First)
-                        semesterEnd = vacation.Begin;
+                        semesterEnd = vacation.Begin.AddDays(-3);
                     else
-                        semesterStart = vacation.End;
+                        semesterStart = vacation.End.AddDays(3);
                 }
             }
 
@@ -36,9 +36,9 @@ namespace StundenplanImport.Model
                 if (vacation.Title.StartsWith("Winterferien"))
                 {
                     if (semester == Semester.First)
-                        semesterEnd = vacation.Begin;
+                        semesterEnd = vacation.Begin.AddDays(-3);
                     else
-                        semesterStart = vacation.End;
+                        semesterStart = vacation.End.AddDays(3);
                 }
             }
 

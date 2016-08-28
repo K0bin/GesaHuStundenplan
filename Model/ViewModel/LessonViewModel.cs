@@ -11,7 +11,7 @@ namespace StundenplanImport.Model.ViewModel
     {
         public DayOfWeek Day
         { get; private set; }
-        public int Number
+        public int Period
         { get; private set; }
 
         public int Duration
@@ -41,10 +41,10 @@ namespace StundenplanImport.Model.ViewModel
         public Week Week
         { get; private set; }
 
-        public LessonViewModel(DayOfWeek day, int number, int duration, string name, string teacherOrSchoolClass, string room, string color, Week week = Week.Both, List<ClassViewModel> classes = null)
+        public LessonViewModel(DayOfWeek day, int period, int duration, string name, string teacherOrSchoolClass, string room, string color, Week week = Week.Both, List<ClassViewModel> classes = null)
         {
             Day = day;
-            Number = number;
+            Period = period;
             Duration = duration;
             Name = Names.ResolveSubject(name);
             Room = room;

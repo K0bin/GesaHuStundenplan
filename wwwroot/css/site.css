@@ -37,3 +37,8 @@
     vertical-align: middle;
     width:256px;
 }
+
+button a {
+    color:white;
+    text-decoration:none;
+}
