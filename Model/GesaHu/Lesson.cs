@@ -73,6 +73,12 @@ namespace StundenplanImport.Model.GesaHu
             }
         }
 
+        public string Room
+        { get; set; }
+
+        public string Color
+        { get; set; }
+
         /// <summary>
         /// The tag found on the web timetable
         /// Used to assign a course from the second table

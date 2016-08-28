@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<form asp-controller="Home" asp-action="ExportIcf" method="post">
+<form asp-controller="Export" asp-action="GoogleCalendar" method="post">
     <table class="table table-bordered timetable">
         <thead>
             <tr>
@@ -46,9 +46,6 @@
                 {
                     <tr>
                         <td>@(lessonRow + 1)</td>
-                        @{
-                            Week previousWeek = Week.None;
-                        }
                         @for (int dayColumn = 0; dayColumn < 5; dayColumn++)
                         {
                             Week week = Week.None;
@@ -61,7 +58,7 @@
                                     <td rowspan="@lesson.Duration.ToString()" id="cell-@(lessonCount)" class="week_@lesson.Week.ToString().ToLower()">
                                         <a id="" href="javascript:void(0)" onclick="onLessonRemoved(@(lessonCount));"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 
-                                        <span class="subject">@((lesson.Classes.Count == 1) ? lesson.Classes[0].Name : lesson.Name)<br />@((lesson.Classes.Count == 1) ? lesson.Classes[0].Teacher : lesson.TeacherOrSchoolClass)</span>
+                                        <span class="subject">@lesson.Name<br />@lesson.TeacherOrSchoolClass<br />@lesson.Room</span>
                                         @if (lesson.Classes.Count > 1)
                                         {
                                             <select id="select-@(lessonCount)" class="selectpicker" onchange="onLessonClassSelected(@(lessonCount));">

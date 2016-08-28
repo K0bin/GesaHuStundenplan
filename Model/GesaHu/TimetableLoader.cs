@@ -15,16 +15,14 @@ namespace StundenplanImport.Model.GesaHu
 
         private int timetableIndex = 0;
         private char kindChar = 'c';
-        private Semester semester;
 
         private bool hasSchoolClass = false;
         private string schoolYear;
         private char schoolClass;
 
-        public TimetableLoader(TimetableKind kind, string element, Semester semester = Semester.First)
+        public TimetableLoader(TimetableKind kind, string element)
         {
             this.kind = kind;
-            this.semester = semester;
 
             switch (kind)
             {
@@ -56,26 +54,44 @@ namespace StundenplanImport.Model.GesaHu
             timetableIndex += 1;
         }
 
-        private Uri BuildUri(Week week = Week.Even, Semester semester = Semester.First)
+        private Uri BuildUri(Week week = Week.Even)
         {
             if(week == Week.Both)
                 throw new Exception("Can't build the uri for both weeks.");
 
-            int table = 4 + (int)week + (int)semester * 2;
-            string url = String.Format("http://gesahui.de/schueler/lsimon1344/stundenplan/stupla_untis/0{0}/{1}/{1}{2}.htm", table, kindChar, timetableIndex.ToString("D5"));
+            int table = 35 + (int)week;
+            string url = String.Format("http://gesahui.de/schueler/lsimon1344/stundenplan/stupla_untis/{0}/{1}/{1}{2}.htm", table, kindChar, timetableIndex.ToString("D5"));
             return new Uri(url);
         }
 
         public async Task<List<Lesson>> LoadAsync()
         {
             var evenClient = new HttpClient();
-            var evenBytes = await evenClient.GetByteArrayAsync(BuildUri(Week.Even));
+            var evenUri = BuildUri(Week.Even);
+            byte[] evenBytes = new byte[0];
+            try
+            {
+                evenBytes = await evenClient.GetByteArrayAsync(evenUri);
+            }
+            catch(HttpRequestException e)
+            {
+                throw new HttpRequestException("Can't access the timetable for even weeks. (Uri: )"+ evenUri, e);
+            }
             var evenHtml = Encoding.GetEncoding("ISO-8859-1").GetString(evenBytes);
 
             var evenLessons = Parse(evenHtml, Week.Even);
 
             var oddClient = new HttpClient();
-            var oddBytes = await oddClient.GetByteArrayAsync(BuildUri(Week.Odd));
+            var oddUri = BuildUri(Week.Odd);
+            byte[] oddBytes = new byte[0];
+            try
+            {
+                oddBytes = await oddClient.GetByteArrayAsync(oddUri);
+            }
+            catch(HttpRequestException e)
+            {
+                throw new HttpRequestException("Can't access the timetable for odd weeks. (Uri: )" + oddUri, e);
+            }
             var oddHtml = Encoding.GetEncoding("ISO-8859-1").GetString(oddBytes);
 
             var oddLessons = Parse(oddHtml, Week.Odd);
@@ -197,6 +213,7 @@ namespace StundenplanImport.Model.GesaHu
                         {
                             lesson.Name = relevantClasses[0].Name;
                             lesson.Teacher = relevantClasses[0].Teacher;
+                            lesson.Room = relevantClasses[0].Room;
                         }
                         else
                             lesson.Classes = relevantClasses;
@@ -212,35 +229,67 @@ namespace StundenplanImport.Model.GesaHu
             if (td == null)
                 return null;
 
+            string color = string.Empty;
+            if (td.Attributes != null && td.Attributes.Contains("bgColor") && !string.IsNullOrWhiteSpace(td.Attributes["bgColor"]?.Value))
+                color = td.Attributes["bgColor"].Value;
+
             var innerTable = td.Element("table");
             var rows = innerTable.Elements("tr");
 
             if (!rows.Any())
                 return null;
             
-            var rowColumns = rows.First().Elements("td");
-            if (!rowColumns.Any())
-                return null;
+            int rowsCount = rows.Count();
 
-            var name = rowColumns.First().InnerText.Trim().Replace("*", "").Replace(".", "");
-            var teacher = string.Empty;
-            if(rowColumns.Count() > 1)
-                teacher = rowColumns.ElementAt(1).InnerText.Trim();
+            string name = string.Empty;
+            string teacher = string.Empty;
+            string _schoolClass = string.Empty;
+            string tag = string.Empty;
+            string room = string.Empty;
+
+            if (kind == TimetableKind.Student)
+            {
+                name = rows.First().InnerText.Trim().Replace("*", "").Replace(".", "");
+                if (rowsCount > 1)
+                    teacher = rows.ElementAt(1).InnerText.Trim();
+                if (rowsCount > 2)
+                    room = rows.ElementAt(2).InnerText.Trim();
+            }
+            else
+            {
+                var firstRowColumns = rows.First().Elements("td");
+                if (!firstRowColumns.Any())
+                    return null;
+                int firstRowColumnsCount = firstRowColumns.Count();
+
+                if (kind == TimetableKind.Class)
+                {
+                    name = firstRowColumns.First().InnerText.Trim();
+                    if (firstRowColumnsCount > 1)
+                        teacher = firstRowColumns.ElementAt(1).InnerText.Trim();
+
+                    // Parse tag to match info from the second table
+                    if (rows.Count() > 1)
+                    {
+                        var columns = rows.ElementAt(1).Elements("td");
+                        if (columns.Count() > 1)
+                            tag = columns.ElementAt(1).InnerText.Trim();
+                        else if (columns.Any())
+                            tag = columns.ElementAt(0).InnerText.Trim();
+                    }
+                }
+                else
+                {
+                    _schoolClass = firstRowColumns.First().InnerText.Trim();
+                    if (firstRowColumnsCount > 1)
+                        name = firstRowColumns.ElementAt(1).InnerText.Trim();
+                }
+
+            }
+            
             int duration = int.Parse(td.Attributes["rowspan"].Value) / 2;
 
-            string tag = string.Empty;
-            if (kind == TimetableKind.Class)
-            {
-                if (rows.Count() > 1)
-                {
-                    var columns = rows.ElementAt(1).Elements("td");
-                    if(columns.Count() > 1)
-                        tag = columns.ElementAt(1).InnerText.Trim();
-                    else if(columns.Any())
-                        tag = columns.ElementAt(0).InnerText.Trim();
-                }
-            }
-
+            // Fix two 45min lessons instead of one 90min
             if (previousLesson != null && name.ToLower() == previousLesson.Name.ToLower())
             {
                 previousLesson.Duration += duration;
@@ -253,15 +302,13 @@ namespace StundenplanImport.Model.GesaHu
             Lesson lesson = new Lesson(dayOfWeek, number, name, duration);
             lesson.Name = name;
             lesson.Teacher = teacher;
+            lesson.Room = room;
+            lesson.Color = color;
+            if (kind == TimetableKind.Teacher)
+                lesson.SchoolClass = _schoolClass;
 
             if (!string.IsNullOrWhiteSpace(tag))
-                lesson.Tags.Add(tag);
-
-            if (kind == TimetableKind.Teacher)
-            {
-                if (rows.Count() > 1)
-                    lesson.SchoolClass = rows.ElementAt(1).InnerText.Trim();
-            }
+                lesson.Tags.Add(tag);            
 
             return lesson;
         }

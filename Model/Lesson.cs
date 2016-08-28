@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,17 +9,20 @@ namespace StundenplanImport.Model
     public class Lesson
    {
         public Week Week
-        { get; set; }
+        { get; set; } = Week.Both;
 
+        [Required]
         public DayOfWeek Day
         { get; set; }
 
+        [Required]
         public int Number
         { get; set; }
 
         public int Duration
-        { get; set; }
+        { get; set; } = 1;
 
+        [Required]
         public string Name
         { get; set; }
 

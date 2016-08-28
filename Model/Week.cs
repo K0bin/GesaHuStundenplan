@@ -8,8 +8,8 @@ namespace StundenplanImport.Model
     public enum Week
     {
         None = 3,
-        Even = 0,
-        Odd = 1,
+        Odd = 0,
+        Even = 1,
         Both = 2
     }
 }

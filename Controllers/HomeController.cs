@@ -53,25 +53,12 @@ namespace StundenplanImport.Controllers
                 {
                     classVMs.Add(new ClassViewModel(_class.Name, _class.Teacher, _class.Room));
                 }
-                lessonVMs.Add(new LessonViewModel(lesson.DayOfWeek, lesson.Number, lesson.Duration, lesson.Name, kind == TimetableKind.Teacher ? lesson.SchoolClass : lesson.Teacher, lesson.Week, classVMs));
+                lessonVMs.Add(new LessonViewModel(lesson.DayOfWeek, lesson.Number, lesson.Duration, lesson.Name, kind == TimetableKind.Teacher ? lesson.SchoolClass : lesson.Teacher, lesson.Room, lesson.Color, lesson.Week, classVMs));
             }
 
             var viewModel = new EditViewModel(kind, element, lessonVMs);
 
             return View(viewModel);
-        }
-
-        public async Task<IActionResult> Publish(ICollection<Model.Lesson> lessons)
-        {
-            return View();
-        }
-
-        public IActionResult ExportIcf(string timetableName, ICollection<Model.Lesson> lessons)
-        {
-            var exporter = new ExporterICalendar();
-            //var file = exporter.Exportsn(timetableName, lessons);
-
-            return View("Publish");
         }
 
         public IActionResult Error()
