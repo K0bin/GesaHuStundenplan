@@ -48,12 +48,13 @@ namespace StundenplanImport.Model.Export
                     rrule.Until = yearPartEnd;
 
                     var description = (kind == TimetableKind.Teacher ? "Kurs: " : "Lehrer: ") + lesson.TeacherOrSchoolClass;
+                    var room = Names.ResolveRoom(lesson.Room);
 
                     var calEvent = new Event()
                     {
                         Summary = Names.ResolveSubject(lesson.Name),
                         Description = description,
-                        Location = "Gesamtschule Hungen " + Names.ResolveRoom(lesson.Room),
+                        Location = "Gesamtschule Hungen " + (!string.IsNullOrWhiteSpace(room) ? " - " + Names.ResolveRoom(lesson.Room) : string.Empty),
                         DtStart = new CalDateTime(dateStart),
                         DtEnd = new CalDateTime(dateEnd),
                         RecurrenceRules = { rrule },
