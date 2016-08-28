@@ -26,7 +26,7 @@ namespace StundenplanImport.Model.Export
             for(int i = 0; i < vacations.Count - 1; i++)
             {
                 var yearPartStart = vacations[i].End.AddDays(3);
-                var yearPartEnd = vacations[i+1].Begin.AddDays(-1);
+                var yearPartEnd = vacations[i+1].Begin;
 
                 // Workaround for inconsistent vacation data by api, ensure start is monday
                 if (yearPartStart.DayOfWeek != DayOfWeek.Monday && yearPartStart.DayOfWeek != DayOfWeek.Saturday && yearPartStart.DayOfWeek != DayOfWeek.Sunday)
@@ -62,7 +62,7 @@ namespace StundenplanImport.Model.Export
                     {
                         Summary = Names.ResolveSubject(lesson.Name),
                         Description = description,
-                        Location = "Gesamtschule Hungen " + (!string.IsNullOrWhiteSpace(room) ? " - " + Names.ResolveRoom(lesson.Room) : string.Empty),
+                        Location = "Gesamtschule Hungen" + (!string.IsNullOrWhiteSpace(room) ? ": " + Names.ResolveRoom(lesson.Room) : string.Empty),
                         DtStart = new CalDateTime(dateStart),
                         DtEnd = new CalDateTime(dateEnd),
                         RecurrenceRules = { rrule },
@@ -75,7 +75,7 @@ namespace StundenplanImport.Model.Export
             var serializer = new CalendarSerializer(new SerializationContext());
             var serializedCalendar = serializer.SerializeToString(calendar);
 
-            string filePath = Path.Combine("ICalendar", fileName);
+            string filePath = Path.Combine("Static", "ICalendar", fileName);
             File.WriteAllText(filePath, serializedCalendar);
 
             return filePath;
