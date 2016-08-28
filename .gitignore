@@ -1,6 +1,7 @@
 # Sensible information (sort of)
 Model/GesaHu/Names.cs
 client_id.json
+ICalendar/
 
 # Hidden files
 .*
