@@ -38,6 +38,9 @@ namespace StundenplanImport.Model.ViewModel
         public string ShortTeacher
         { get; private set; }
 
+        public string ShortRoom
+        { get; private set; }
+
         public Week Week
         { get; private set; }
 
@@ -47,7 +50,7 @@ namespace StundenplanImport.Model.ViewModel
             Period = period;
             Duration = duration;
             Name = Names.ResolveSubject(name);
-            Room = room;
+            Room = Names.ResolveRoom(room);
             TeacherOrSchoolClass = Names.ResolveTeacher(teacherOrSchoolClass);
             Color = color;
             Week = week;
@@ -59,6 +62,7 @@ namespace StundenplanImport.Model.ViewModel
             
             ShortName = name;
             ShortTeacher = teacherOrSchoolClass;
+            ShortRoom = room;
         }
     }
 }

@@ -85,7 +85,7 @@ namespace StundenplanImport.Model
             {
                 foreach (var vacation in previousYearVacation)
                 {
-                    if (vacation.Title.StartsWith("Weihnachtsferien"))
+                    if (vacation.Title.StartsWith("Weihnachtsferien", StringComparison.InvariantCultureIgnoreCase))
                     {
                         semesterStart = vacation.End.AddDays(3);
                     }
@@ -94,18 +94,18 @@ namespace StundenplanImport.Model
 
             foreach (var vacation in vacations)
             {
-                if (vacation.Title.StartsWith("Winterferien") && semester == Semester.Second)
+                if (vacation.Title.StartsWith("Winterferien", StringComparison.InvariantCultureIgnoreCase) && semester == Semester.Second)
                 {
                     semesterStart = vacation.Begin.AddDays(-3);
                 }
-                if (vacation.Title.StartsWith("Sommerferien"))
+                if (vacation.Title.StartsWith("Sommerferien", StringComparison.InvariantCultureIgnoreCase))
                 {
                     if (semester == Semester.First)
                         semesterStart = vacation.End.AddDays(3);
                     else
                         semesterEnd = vacation.Begin.AddDays(-3);
                 }
-                if (vacation.Title.StartsWith("Weihnachtsferien") && semester == Semester.First)
+                if (vacation.Title.StartsWith("Weihnachtsferien", StringComparison.InvariantCultureIgnoreCase) && semester == Semester.First)
                 {
                     semesterEnd = vacation.Begin.AddDays(-3);
                 }
@@ -115,7 +115,7 @@ namespace StundenplanImport.Model
             {
                 foreach (var vacation in nextYearVacations)
                 {
-                    if (vacation.Title.StartsWith("Winterferien"))
+                    if (vacation.Title.StartsWith("Winterferien", StringComparison.InvariantCultureIgnoreCase))
                     {
                         semesterEnd = vacation.Begin.AddDays(-3);
                     }

@@ -42,3 +42,7 @@ button a {
     color:white;
     text-decoration:none;
 }
+
+td .bootstrap-select {
+    width: 256px !important;
+}

@@ -22,14 +22,18 @@ namespace StundenplanImport.Model.ViewModel
         public string ShortTeacher
         { get; private set; }
 
+        public string ShortRoom
+        { get; private set; }
+
         public ClassViewModel(string name, string teacher, string room)
         {
             Name = Names.ResolveSubject(name);
             Teacher = Names.ResolveTeacher(teacher);
-            Room = room;
+            Room = Names.ResolveRoom(room);
 
             ShortName = name;
             ShortTeacher = teacher;
+            ShortRoom = room;
         }
     }
 }
