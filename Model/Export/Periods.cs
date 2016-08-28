@@ -9,7 +9,7 @@ namespace StundenplanImport.Model.Export
     public static class Periods
     {
         public static readonly int[] Hours =   { 08, 08, 09, 10, 11, 12, 14, 14, 15, 16 };
-        public static readonly int[] Minutes = { 00, 45, 50, 35, 40, 35, 00, 45, 45, 30 };
+        public static readonly int[] Minutes = { 00, 50, 50, 40, 40, 40, 00, 45, 45, 30 };
 
         public const int Duration = 45;
 

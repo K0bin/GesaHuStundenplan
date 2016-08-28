@@ -43,7 +43,7 @@ namespace StundenplanImport.Model.Export
                     if (lesson.Week == Week.Odd && week % 2 == 0 || lesson.Week == Week.Even && week % 2 == 1)
                         dateStart = dateStart.AddDays(7);
 
-                    var dateEnd = dateStart.AddMinutes(Periods.Duration * lesson.Duration);
+                    var dateEnd = dateStart.AddMinutes(Periods.Duration * lesson.Duration + lesson.Duration / 2 * 5);
                     var rrule = new RecurrencePattern(FrequencyType.Weekly, lesson.Week == Week.Both ? 1 : 2);
                     rrule.Until = yearPartEnd;
 
