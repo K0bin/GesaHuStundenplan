@@ -23,10 +23,18 @@ namespace StundenplanImport.Model.Export
 
             var calendar = new Calendar();
 
-            for(int i = 0; i < vacations.Count -1; i++)
+            for(int i = 0; i < vacations.Count - 1; i++)
             {
                 var yearPartStart = vacations[i].End.AddDays(3);
-                var yearPartEnd = vacations[i+1].Begin.AddDays(-2);
+                var yearPartEnd = vacations[i+1].Begin.AddDays(-1);
+
+                // Workaround for inconsistent vacation data by api, ensure start is monday
+                if (yearPartStart.DayOfWeek != DayOfWeek.Monday && yearPartStart.DayOfWeek != DayOfWeek.Saturday && yearPartStart.DayOfWeek != DayOfWeek.Sunday)
+                    yearPartStart = yearPartStart.AddDays((int)DayOfWeek.Monday - (int)yearPartStart.DayOfWeek);
+                else if (yearPartStart.DayOfWeek == DayOfWeek.Saturday)
+                    yearPartStart = yearPartStart.AddDays(2);
+                else if (yearPartStart.DayOfWeek == DayOfWeek.Sunday)
+                    yearPartStart = yearPartStart.AddDays(1);
 
                 if (yearPartStart >= semesterEnd || yearPartStart < semesterStart)
                     continue;
@@ -43,7 +51,7 @@ namespace StundenplanImport.Model.Export
                     if (lesson.Week == Week.Odd && week % 2 == 0 || lesson.Week == Week.Even && week % 2 == 1)
                         dateStart = dateStart.AddDays(7);
 
-                    var dateEnd = dateStart.AddMinutes(Periods.Duration * lesson.Duration + lesson.Duration / 2 * 5);
+                    var dateEnd = dateStart.AddMinutes(Periods.Duration * lesson.Duration + (lesson.Period != 8 ? lesson.Duration / 2 * 5 : 0));
                     var rrule = new RecurrencePattern(FrequencyType.Weekly, lesson.Week == Week.Both ? 1 : 2);
                     rrule.Until = yearPartEnd;
 

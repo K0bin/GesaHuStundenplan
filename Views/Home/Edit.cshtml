@@ -64,7 +64,7 @@
                                             <select id="select-@(lessonCount)" class="selectpicker" onchange="onLessonClassSelected(@(lessonCount));">
                                                 @foreach (var _class in lesson.Classes)
                                                 {
-                                                    <option value="@_class.ShortName-@_class.ShortTeacher-@_class.Room">@_class.Name @_class.Teacher @_class.Room</option>
+                                                    <option value="@_class.ShortName-@_class.ShortTeacher-@_class.ShortRoom">@_class.Name @_class.Teacher @_class.Room</option>
                                                 }
                                             </select>
                                         }
@@ -75,7 +75,7 @@
                                         <input name="lessons[@(lessonCount)].Duration" type="hidden" value="@lesson.Duration" />
                                         <input name="lessons[@(lessonCount)].Name" type="hidden" value="@lesson.Name" id="name-@(lessonCount)" />
                                         <input name="lessons[@(lessonCount)].TeacherOrSchoolClass" type="hidden" value="@lesson.TeacherOrSchoolClass" id="teacher-@(lessonCount)" />
-                                        <input name="lessons[@(lessonCount)].Room" type="hidden" value="@lesson.Room" id="room-@(lessonCount)" />
+                                        <input name="lessons[@(lessonCount)].Room" type="hidden" value="@lesson.ShortRoom" id="room-@(lessonCount)" />
                                     </td>
 
                                     lessonCount++;
