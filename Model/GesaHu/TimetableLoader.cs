@@ -35,7 +35,7 @@ namespace StundenplanImport.Model.GesaHu
                     {
                         hasSchoolClass = true;
                         schoolClass = elementParts[0][elementParts[0].Length - 1];
-                        schoolYear = elementParts[0].Substring(0, elementParts[0].Length);
+                        schoolYear = elementParts[0].Substring(0, elementParts[0].Length - 1);
                     }
                     break;
 
