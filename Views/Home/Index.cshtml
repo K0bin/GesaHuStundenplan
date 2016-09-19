@@ -58,9 +58,9 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu3">
-                    @foreach (var entry in (string[])ViewData["Teachers"])
+                    @foreach (var entry in (Tuple<string, string>[])ViewData["Teachers"])
                     {
-                        <li>@Html.ActionLink(entry, "edit", new { Teacher = entry })</li>
+                        <li>@Html.ActionLink(entry.Item2, "edit", new { Teacher = entry.Item1 })</li>
                     }
                 </ul>
             </div>

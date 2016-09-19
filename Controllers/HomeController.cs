@@ -16,7 +16,13 @@ namespace StundenplanImport.Controllers
         {
             ViewData["Classes"] = Names.Classes;
             ViewData["Students"] = Names.Students;
-            ViewData["Teachers"] = Names.Teachers;
+
+            var teachers = new Tuple<string, string>[Names.Teachers.Length];
+            for(int i = 0; i < Names.Teachers.Length; i++)
+            {
+                teachers[i] = Tuple.Create(Names.Teachers[i], Names.ResolveTeacher(Names.Teachers[i]));
+            }
+            ViewData["Teachers"] = teachers;
 
             return View();
         }
