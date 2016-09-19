@@ -67,6 +67,11 @@ namespace StundenplanImport.Controllers
             return View(viewModel);
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+
         public IActionResult Error()
         {
             return View();
