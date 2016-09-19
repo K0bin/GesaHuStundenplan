@@ -5,7 +5,7 @@
 <div class="row">
     <div class="col-sm-6 col-xs-12">
         <h3>Import erfolgreich</h3>
-        <a href="@ViewData["FilePath"]" target="_blank" download><button type="button" class="btn btn-success">Kalenderdatei herunterladen</button></a>
+        <a asp-controller="Export" asp-action="Download" asp-route-fileName="@ViewData["File"]" as target="_blank" download><button type="button" class="btn btn-success">Kalenderdatei herunterladen</button></a>
     </div>
 
     <div class="col-sm-6 col-xs-12">

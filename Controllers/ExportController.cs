@@ -6,6 +6,7 @@ using StundenplanImport.Model;
 using StundenplanImport.Model.Export;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,11 +26,19 @@ namespace StundenplanImport.Controllers
             var exporter = new ExporterICalendar();
             
             var file = await exporter.ExportAsync(kind, timetableName, lessons);
-            var webFile = file.Replace('\\', '/');
-
-            ViewData["FilePath"] = webFile;
+            ViewData["File"] = file;
 
             return View("SuccessICalendar");
+        }
+
+        public FileResult Download(string fileName)
+        {
+            var path = Path.Combine("Static", "ICalendar", fileName + ".ics");
+            
+            var bytes = System.IO.File.ReadAllBytes(path);
+            System.IO.File.Delete(path);
+                
+            return File(bytes, "text/calendar", "Stundenplan.ics");
         }
     }
 }

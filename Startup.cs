@@ -11,6 +11,7 @@ using System.IO;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using StundenplanImport.Model;
+using Microsoft.Extensions.FileProviders;
 
 namespace StundenplanImport
 {
@@ -75,7 +76,7 @@ namespace StundenplanImport
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}");
 
                 /*
                 routes.MapRoute(name: "login",
@@ -83,7 +84,7 @@ namespace StundenplanImport
                 */
 
                 routes.MapRoute(name: "export",
-                    template: "{controller=Export}/{action=ICalendar}/{id?}");
+                    template: "{controller=Export}/{action=ICalendar}");
             });
         }
     }

@@ -15,7 +15,7 @@ namespace StundenplanImport.Model.Export
     {
         public async Task<string> ExportAsync(TimetableKind kind, string timetableName, ICollection<Lesson> lessons)
         {
-            var fileName = timetableName + "_" + DateTime.Now.ToString("dd-M-yyyy-h-mm-ss") + ".icf";
+            var fileName = timetableName + "_" + DateTime.Now.ToString("dd-M-yyyy-h-mm-ss");
             var vacations = await Vacation.LoadForYearAsync(Bundesland.Hessen, DateTime.Now.Year.ToString());
             var semesterDates = await Vacation.GetSemesterDatesAsync(Semester.First, vacations);
             var semesterStart = semesterDates.Item1;
@@ -75,10 +75,10 @@ namespace StundenplanImport.Model.Export
             var serializer = new CalendarSerializer(new SerializationContext());
             var serializedCalendar = serializer.SerializeToString(calendar);
 
-            string filePath = Path.Combine("Static", "ICalendar", fileName);
+            string filePath = Path.Combine("Static", "ICalendar", fileName + ".ics");
             File.WriteAllText(filePath, serializedCalendar);
 
-            return filePath;
+            return fileName;
         }
     }
 }

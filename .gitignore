@@ -2,6 +2,7 @@
 Model/GesaHu/Names.cs
 client_id.json
 ICalendar/
+Static/
 
 # Hidden files
 .*
