@@ -14,13 +14,20 @@ namespace StundenplanImport.Controllers
     {
         public IActionResult Index()
         {
-            ViewData["Classes"] = Names.Classes;
-            ViewData["Students"] = Names.Students;
+            var classes = (string[])Names.Classes.Clone();
+            Array.Sort(classes);
+            ViewData["Classes"] = classes;
 
-            var teachers = new Tuple<string, string>[Names.Teachers.Length];
-            for(int i = 0; i < Names.Teachers.Length; i++)
+            var students = (string[])Names.Students.Clone();
+            Array.Sort(students);
+            ViewData["Students"] = students;
+
+            var teacherShorts = (string[])Names.Teachers.Clone();
+            Array.Sort(teacherShorts);
+            var teachers = new Tuple<string, string>[teacherShorts.Length];
+            for(int i = 0; i < teacherShorts.Length; i++)
             {
-                teachers[i] = Tuple.Create(Names.Teachers[i], Names.ResolveTeacher(Names.Teachers[i]));
+                teachers[i] = Tuple.Create(teacherShorts[i], Names.ResolveTeacher(teacherShorts[i]));
             }
             ViewData["Teachers"] = teachers;
 
