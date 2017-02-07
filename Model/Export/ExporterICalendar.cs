@@ -17,7 +17,8 @@ namespace StundenplanImport.Model.Export
         {
             var fileName = timetableName + "_" + DateTime.Now.ToString("dd-M-yyyy-h-mm-ss");
             var vacations = await Vacation.LoadForYearAsync(Bundesland.Hessen, DateTime.Now.Year.ToString());
-            var semesterDates = await Vacation.GetSemesterDatesAsync(Semester.First, vacations);
+            vacations.Insert(vacations.FindIndex(v => v.Title == "Osterferien 2017 Hessen"), new Vacation("HACKY", new DateTime(2017, 1, 1), new DateTime(2017, 2, 3)));
+            var semesterDates = await Vacation.GetSemesterDatesAsync(Semester.Second, vacations);
             var semesterStart = semesterDates.Item1;
             var semesterEnd = semesterDates.Item2;
 

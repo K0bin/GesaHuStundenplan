@@ -27,6 +27,13 @@ namespace StundenplanImport.Model
         public DateTime End
         { get; private set; }
 
+        public Vacation(string title, DateTime begin, DateTime end)
+        {
+            Title = title;
+            Begin = begin;
+            End = end;
+        }
+
         public int CompareTo(Vacation other)
         {
             if (other == null || other.Begin > Begin)
@@ -120,6 +127,11 @@ namespace StundenplanImport.Model
                         semesterEnd = vacation.Begin.AddDays(-3);
                     }
                 }
+            }
+            else
+            {
+                //HACKY
+                semesterStart = new DateTime(2017, 2, 6);
             }
 
             return Tuple.Create<DateTime, DateTime>(semesterStart, semesterEnd);

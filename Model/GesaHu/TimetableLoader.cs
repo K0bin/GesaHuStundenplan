@@ -59,8 +59,8 @@ namespace StundenplanImport.Model.GesaHu
             if(week == Week.Both)
                 throw new Exception("Can't build the uri for both weeks.");
 
-            int table = 45 + (int)week;
-            string url = String.Format("http://gesahui.de/schueler/lsimon1344/stundenplan/stupla_untis/{0}/{1}/{1}{2}.htm", table, kindChar, timetableIndex.ToString("D5"));
+            int table = 6 + (int)week;
+            string url = String.Format("http://gesahui.de/home/stundenplan/stupla_untis/{0}/{1}/{1}{2}.htm", table.ToString().PadLeft(2, '0'), kindChar, timetableIndex.ToString("D5"));
             return new Uri(url);
         }
 
